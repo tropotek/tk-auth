@@ -1,0 +1,33 @@
+{
+  "name": "ttek/tk-form",
+  "type": "library",
+  "description": "Create dynamic forms easily with the Tk framework",
+  "keywords": [
+    "tropotek",
+    "Form"
+  ],
+  "time": "2013-12-14",
+  "license": "MIT",
+  "version": "2.0.0",
+  "authors": [
+    {
+      "name": "Michael Mifsud",
+      "email": "info@tropotek.com.au",
+      "homepage": "http://www.tropotek.com/"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Tk\\": ""
+    }
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "ttek/tk-framework": "~2.0"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "2.0.x-dev"
+    }
+  }
+}
