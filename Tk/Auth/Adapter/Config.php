@@ -98,7 +98,6 @@ class Config extends Iface
         return $this;
     }
 
-
     /**
      *
      * @return Result

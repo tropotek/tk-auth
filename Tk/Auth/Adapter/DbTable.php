@@ -114,15 +114,15 @@ class DbTable extends Iface
         if (!$this->getUsername() || !$this->getPassword()) {
             return Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
         }
-        $sql = sprintf('SELECT * FROM `%s` WHERE `%s` = %s LIMIT 1',
-            $this->tableName,
-            $this->usernameColumn,
+        $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
+            $this->db->quoteParameter($this->tableName),
+            $this->db->quoteParameter($this->usernameColumn),
             $this->db->quote($this->getUsername()));
         try {
             $result = $this->db->query($sql);
             $user = $result->fetchObject();
             if ($user) {
-                $passHash = \Tk\Auth\Auth::hash($this->getPassword(), $this->getHashFunction());
+                $passHash = \Tk\Auth::hash($this->getPassword(), $this->getHashFunction());
                 if ($passHash == $user->{$this->passwordColumn}) {
                     return new Result(Result::SUCCESS, $user);
                 }

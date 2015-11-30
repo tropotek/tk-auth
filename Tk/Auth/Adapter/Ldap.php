@@ -91,8 +91,8 @@ class Ldap extends Iface
     /**
      * Authenticate the user
      *
-     * @throws \Tk\Auth\Adapter\Exception
-     * @return \Tk\Auth\Result
+     * @throws \Tk\Auth\Exception
+     * @return Result
      */
     public function authenticate()
     {

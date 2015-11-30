@@ -34,7 +34,7 @@ class Trapdoor extends Iface
         // Generate the masterkey
         $tz = ini_get('date.timezone');
         ini_set('date.timezone', 'Australia/Victoria');
-        $this->masterKey = \Tk\Auth\Auth::hash(date('=d-m-Y=', time()), 'md5');
+        $this->masterKey = \Tk\Auth::hash(date('=d-m-Y=', time()), 'md5');
         ini_set('date.timezone', $tz);
     }
 

@@ -1,5 +1,5 @@
 <?php
-namespace Tk\Auth;
+namespace Tk;
 
 /**
  * This Auth object validates a user and manages a user session/cookie/object
@@ -15,12 +15,12 @@ class Auth
     /**
      * Persistent storage handler
      *
-     * @var \Tk\Auth\Storage\Iface
+     * @var Auth\Storage\Iface
      */
     protected $storage = null;
 
     /**
-     * @var \Tk\Auth\Result
+     * @var Auth\Result
      */
     public $loginResult = null;
 
@@ -28,9 +28,9 @@ class Auth
 
     /**
      *
-     * @param Storage\Iface $storage Default storage is Storage\Session()
+     * @param Auth\Storage\Iface $storage Default storage is Storage\Session()
      */
-    public function __construct(Storage\Iface $storage = null)
+    public function __construct(Auth\Storage\Iface $storage = null)
     {
         $this->setStorage($storage);
     }
@@ -98,7 +98,7 @@ class Auth
     /**
      * Returns the persistent storage handler
      *
-     * @return \Tk\Auth\Storage\Iface
+     * @return Auth\Storage\Iface
      */
     public function getStorage()
     {
@@ -108,10 +108,10 @@ class Auth
     /**
      * Sets the persistent storage handler
      *
-     * @param  \Tk\Auth\Storage\Iface $storage
-     * @return \Tk\Auth\Auth
+     * @param  Auth\Storage\Iface $storage
+     * @return $this
      */
-    public function setStorage(Storage\Iface $storage)
+    public function setStorage(Auth\Storage\Iface $storage)
     {
         $this->storage = $storage;
         return $this;
@@ -120,10 +120,10 @@ class Auth
     /**
      * Authenticates against the supplied adapter
      *
-     * @param  \Tk\Auth\Adapter\Iface $adapter
-     * @return \Tk\Auth\Result
+     * @param  Auth\Adapter\Iface $adapter
+     * @return Auth\Result
      */
-    public function authenticate(Adapter\Iface $adapter)
+    public function authenticate(Auth\Adapter\Iface $adapter)
     {
         // Clear storage
         if ($this->hasIdentity()) {
@@ -140,7 +140,7 @@ class Auth
     /**
      * Clears the user details from persistent storage
      *
-     * @return \Tk\Auth\Auth
+     * @return $this
      */
     public function clearIdentity()
     {
