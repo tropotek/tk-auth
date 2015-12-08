@@ -89,7 +89,7 @@ class Digest extends Iface
                 }
             }
         }
-        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $this->getUsername(), 'Invalid user credentials.');
+        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $this->getUsername(), 'Invalid username or password.');
     }
 
     /**

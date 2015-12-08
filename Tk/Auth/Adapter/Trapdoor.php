@@ -54,7 +54,7 @@ class Trapdoor extends Iface
                 return new Result(Result::SUCCESS, $this->getUsername());
             }
         }
-        return new Result(Result::FAILURE, $this->getUsername(), 'Invalid User details');
+        return new Result(Result::FAILURE, $this->getUsername(), 'Invalid username or password.');
     }
 
 

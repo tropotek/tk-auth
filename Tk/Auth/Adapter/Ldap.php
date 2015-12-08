@@ -97,7 +97,7 @@ class Ldap extends Iface
     public function authenticate()
     {
         if (!$this->getPassword()) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, 'Invalid account details');
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, 'Invalid username or password.');
         }
         //$ldapFilter = sprintf('%s=%s', $this->getOption('system.auth.ldap.userattr'), $this->getUsername());
         $ldap = ldap_connect($this->uri, $this->port);
