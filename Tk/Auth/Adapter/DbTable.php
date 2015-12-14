@@ -11,6 +11,13 @@ use Tk\Auth\Result;
  * A DB table authenticator adaptor
  *
  *
+ * Config options:
+ *
+ *   $config['db']                         = \Tk\Db\Pdo (required)
+ *   $config['system.auth.dbtable.tableName']    = 'user'
+ *   $config['system.auth.dbtable.usernameColumn']    = 'username'
+ *   $config['system.auth.dbtable.passwordColumn']    = 'password'
+ *
  */
 class DbTable extends Iface
 {
@@ -31,23 +38,26 @@ class DbTable extends Iface
     protected $passwordColumn = 'password';
 
     /**
-     * @var \PDO
+     * @var \Tk\Db\Pdo
      */
     protected $db = null;
-
 
 
     /**
      * Constructor
      *
-     * @param \PDO $db
      * @param  string $username The username of the account being authenticated
      * @param  string $password The password of the account being authenticated
+     * @param array $config
      */
-    public function __construct($db, $username = null, $password = null)
+    public function __construct($username = null, $password = null, $config = array())
     {
         parent::__construct($username, $password);
-        $this->db = $db;
+        $this->db = !empty($config['db']) ? $config['db'] : null;
+        $this->tableName = !empty($config['system.auth.dbtable.tableName']) ? $config['system.auth.dbtable.tableName'] : 'user';
+        $this->usernameColumn = !empty($config['system.auth.dbtable.usernameColumn']) ? $config['system.auth.dbtable.usernameColumn'] : 'username';
+        $this->passwordColumn = !empty($config['system.auth.dbtable.passwordColumn']) ? $config['system.auth.dbtable.passwordColumn'] : 'password';
+        
     }
 
     /**
@@ -112,7 +122,7 @@ class DbTable extends Iface
     public function authenticate()
     {
         if (!$this->getUsername() || !$this->getPassword()) {
-            return Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
         }
         $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
             $this->db->quoteParameter($this->tableName),
@@ -124,7 +134,7 @@ class DbTable extends Iface
             if ($user) {
                 $passHash = \Tk\Auth::hash($this->getPassword(), $this->getHashFunction());
                 if ($passHash == $user->{$this->passwordColumn}) {
-                    return new Result(Result::SUCCESS, $user);
+                    return new Result(Result::SUCCESS,  $this->getUsername());
                 }
             }
         } catch (\Exception $e) {

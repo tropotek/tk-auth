@@ -14,6 +14,10 @@ use Tk\Auth\Result;
  *
  * To be used in conjunction with the tk-tools commands.
  *
+ * Config options:
+ *
+ *   $config['system.auth.trapdoor.key']    = '{Some unique key}'
+ *
  * @see tk-tools
  */
 class Trapdoor extends Iface
@@ -26,16 +30,23 @@ class Trapdoor extends Iface
      *
      * @param  string $username The username of the account being authenticated
      * @param  string $password The password of the account being authenticated
-     * @throws \Tk\Auth\Exception
+     * @param array $config
      */
-    public function __construct($username = null, $password = null)
+    public function __construct($username = null, $password = null, $config = array())
     {
         parent::__construct($username, $password);
         // Generate the masterkey
-        $tz = ini_get('date.timezone');
-        ini_set('date.timezone', 'Australia/Victoria');
-        $this->masterKey = \Tk\Auth::hash(date('=d-m-Y=', time()), 'md5');
-        ini_set('date.timezone', $tz);
+
+        $key = !empty($config['system.auth.trapdoor.key']) ? $config['system.auth.trapdoor.key'] : '';
+        if (!$key) {
+            $tz = ini_get('date.timezone');
+            ini_set('date.timezone', 'Australia/Victoria');
+            $key = date('=d-m-Y=', time()); // Changes daily
+            ini_set('date.timezone', $tz);
+        }
+        
+        $this->masterKey = \Tk\Auth::hash($key, 'md5');
+        
     }
 
     /**
