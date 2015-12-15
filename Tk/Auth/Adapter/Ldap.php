@@ -10,13 +10,6 @@ use Tk\Auth\Result;
 /**
  * LDAP Authentication adapter
  * 
- * Config options:
- * 
- *   $config['system.auth.ldap.host']    = 'centaur.unimelb.edu.au';
- *   $config['system.auth.ldap.tls']    = true;
- *   $config['system.auth.ldap.port']   = 389;
- *   $config['system.auth.ldap.baseDn'] = 'ou=people,o=unimelb';
- *   $config['system.auth.ldap.filter'] = 'uid={username}';
  *
  */
 class Ldap extends Iface
@@ -32,22 +25,112 @@ class Ldap extends Iface
     /**
      * Constructor
      *
-     * @param string $username The DN username EG: 'CN=user1,DC=foo,DC=net'
-     * @param string $password The password of the account being authenticated
-     * @param array $config
-     * @throws \Tk\Auth\Exception
+     * @param string $host
+     * @param string $baseDn
+     * @param string $filter
+     * @param int $port
+     * @param bool $tls
      */
-    public function __construct($username = null, $password = null, $config = array())
+    public function __construct($host, $baseDn, $filter, $port = 389, $tls = false)
     {
-        parent::__construct($username, $password);
-        $p = 'system.auth.ldap.';
-        $this->host = !empty($config[$p.'host']) ? $config[$p.'host'] : '';
-        $this->port = !empty($config[$p.'port']) ? $config[$p.'port'] : '';
-        $this->tls = !empty($config[$p.'tls']) ? $config[$p.'tls'] : '';
-        $this->baseDn = !empty($config[$p.'baseDn']) ? $config[$p.'baseDn'] : '';
-        $this->filter = !empty($config[$p.'filter']) ? $config[$p.'filter'] : '';
+        $this->setHost($host);
+        $this->setBaseDn($baseDn);
+        $this->setFilter($filter);
+        $this->setPort($port);
+        $this->setTls($tls);
     }
 
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @param string $host
+     * @return $this
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
+     * @param int|string $port
+     * @return $this
+     */
+    public function setPort($port)
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function isTls()
+    {
+        return $this->tls;
+    }
+
+    /**
+     * @param bool $tls
+     * @return $this
+     */
+    public function setTls($tls)
+    {
+        $this->tls = $tls;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseDn()
+    {
+        return $this->baseDn;
+    }
+
+    /**
+     * @param string $baseDn
+     * @return $this
+     */
+    public function setBaseDn($baseDn)
+    {
+        $this->baseDn = $baseDn;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    /**
+     * @param string $filter
+     * @return $this
+     */
+    public function setFilter($filter)
+    {
+        $this->filter = $filter;
+        return $this;
+    }
+    
+    
     /**
      * Authenticate the user
      *
@@ -56,17 +139,16 @@ class Ldap extends Iface
      */
     public function authenticate()
     {
-        if (!$this->getPassword()) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, 'Invalid username or password.');
+        if (!$this->getUsername() || !$this->getPassword()) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
         }
-        //$ldapFilter = sprintf('%s=%s', $this->getOption('system.auth.ldap.userattr'), $this->getUsername());
-        $ldap = ldap_connect($this->host, $this->port);
+        $ldap = ldap_connect($this->getHost(), $this->getPort());
         try {
-            if ($this->tls)
+            if ($this->isTls())
                 ldap_start_tls($ldap);
             
-            $ufilter = str_replace('{username}', $this->getUsername(), $this->filter);
-            $b = ldap_bind($ldap, $ufilter . ',' . $this->baseDn, $this->getPassword());
+            $filter = str_replace('{username}', $this->getUsername(), $this->getFilter());
+            $b = ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $this->getPassword());
             
             if (!$b) throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
         } catch (\Exception $e) {

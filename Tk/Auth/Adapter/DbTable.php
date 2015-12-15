@@ -11,13 +11,6 @@ use Tk\Auth\Result;
  * A DB table authenticator adaptor
  *
  *
- * Config options:
- *
- *   $config['db']                         = \Tk\Db\Pdo (required)
- *   $config['system.auth.dbtable.tableName']    = 'user'
- *   $config['system.auth.dbtable.usernameColumn']    = 'username'
- *   $config['system.auth.dbtable.passwordColumn']    = 'password'
- *
  */
 class DbTable extends Iface
 {
@@ -25,17 +18,17 @@ class DbTable extends Iface
     /**
      * @var string
      */
-    protected $tableName = 'user';
+    protected $tableName = '';
 
     /**
      * @var string
      */
-    protected $usernameColumn = 'username';
+    protected $usernameColumn = '';
 
     /**
      * @var string
      */
-    protected $passwordColumn = 'password';
+    protected $passwordColumn = '';
 
     /**
      * @var \Tk\Db\Pdo
@@ -45,77 +38,25 @@ class DbTable extends Iface
 
     /**
      * Constructor
-     *
-     * @param  string $username The username of the account being authenticated
-     * @param  string $password The password of the account being authenticated
-     * @param array $config
+     * 
+     * @param \tk\Db\Pdo $db
+     * @param string $tableName
+     * @param string $userColumn
+     * @param string $passColumn
      */
-    public function __construct($username = null, $password = null, $config = array())
+    public function __construct($db, $tableName, $userColumn, $passColumn)
     {
-        parent::__construct($username, $password);
-        $this->db = !empty($config['db']) ? $config['db'] : null;
-        $this->tableName = !empty($config['system.auth.dbtable.tableName']) ? $config['system.auth.dbtable.tableName'] : 'user';
-        $this->usernameColumn = !empty($config['system.auth.dbtable.usernameColumn']) ? $config['system.auth.dbtable.usernameColumn'] : 'username';
-        $this->passwordColumn = !empty($config['system.auth.dbtable.passwordColumn']) ? $config['system.auth.dbtable.passwordColumn'] : 'password';
+        $this->db = $db;
+        $this->tableName = $tableName;
+        $this->usernameColumn = $userColumn;
+        $this->passwordColumn = $passColumn;
         
     }
 
     /**
-     * @return string
-     */
-    public function getTableName()
-    {
-        return $this->tableName;
-    }
-
-    /**
-     * @param string $tableName
-     * @return $this
-     */
-    public function setTableName($tableName)
-    {
-        $this->tableName = $tableName;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsernameColumn()
-    {
-        return $this->usernameColumn;
-    }
-
-    /**
-     * @param string $usernameColumn
-     * @return $this
-     */
-    public function setUsernameColumn($usernameColumn)
-    {
-        $this->usernameColumn = $usernameColumn;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPasswordColumn()
-    {
-        return $this->passwordColumn;
-    }
-
-    /**
-     * @param string $passwordColumn
-     * @return $this
-     */
-    public function setPasswordColumn($passwordColumn)
-    {
-        $this->passwordColumn = $passwordColumn;
-        return $this;
-    }
-
-    /**
      *
+     * @param $username
+     * @param $password
      * @return Result
      * @throws \Tk\Auth\Exception if answering the authentication query is impossible
      */
@@ -132,9 +73,9 @@ class DbTable extends Iface
             $result = $this->db->query($sql);
             $user = $result->fetchObject();
             if ($user) {
-                $passHash = \Tk\Auth::hash($this->getPassword(), $this->getHashFunction());
+                $passHash = self::hash($this->getPassword(), $this->getHashFunction());
                 if ($passHash == $user->{$this->passwordColumn}) {
-                    return new Result(Result::SUCCESS,  $this->getUsername());
+                    return new Result(Result::SUCCESS, $this->getUsername());
                 }
             }
         } catch (\Exception $e) {

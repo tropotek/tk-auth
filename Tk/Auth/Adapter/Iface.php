@@ -36,23 +36,6 @@ abstract class Iface
 
 
     /**
-     * Constructor
-     *
-     * @param  string $username The username of the account being authenticated
-     * @param  string $password The password of the account being authenticated
-     */
-    public function __construct($username = null, $password = null)
-    {
-        if ($username !== null) {
-            $this->setUsername($username);
-        }
-        if ($password !== null) {
-            $this->setPassword($password);
-        }
-    }
-
-
-    /**
      * Performs an authentication attempt
      *
      * @return \Tk\Auth\Result
@@ -60,6 +43,35 @@ abstract class Iface
      */
     abstract public function authenticate();
 
+    /**
+     * @param string $username
+     * @param string $password
+     * @return $this
+     */
+    public function setCredentials($username, $password) 
+    {
+        $this->setUsername($username);
+        $this->setPassword($password);
+        return $this;
+    }
+
+    /**
+     * Create a hash using the config defined function
+     * NOTE:
+     *   If the has function is changed after the site
+     *   is installed major problems can occur to fix
+     *   you will have to reset all user passwords.
+     *
+     *  Find the hash functions available via hash_algos();
+     *
+     * @param string $str
+     * @param string $hashFunc
+     * @return string (Hashed string to store or compare)
+     */
+    public static function hash($str, $hashFunc = 'md5')
+    {
+        return hash($hashFunc, $str);
+    }
 
     /**
      * Returns the username of the account being authenticated, or

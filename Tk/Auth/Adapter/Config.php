@@ -11,11 +11,6 @@ use Tk\Auth\Result;
  * A Config admin authenticator adaptor
  *
  * Useful for single user sites, such as admin areas.
- * 
- * Config options:
- *
- *   $config['system.auth.config.username']    = 'admin';
- *   $config['system.auth.config.password']    = 'password';
  *
  * This system of authentication should not be used for sites that require high security
  * It is ideal for low security sites that do not hold sensitive information.
@@ -24,31 +19,21 @@ use Tk\Auth\Result;
 class Config extends Iface
 {
 
-    protected $config = null;
+    protected $validUsername = '';
+    
+    protected $validPassword = '';
 
 
     /**
      * Constructor
      *
-     * @param  string $username The username of the account being authenticated
-     * @param  string $password The password of the account being authenticated
-     * @param array|\Tk\Config   $config
-     * @throws \Tk\Auth\Exception
+     * @param string $validUsername The username to validate against
+     * @param string $validPassword The password to validate against
      */
-    public function __construct($username = null, $password = null, $config = array())
+    public function __construct($validUsername, $validPassword)
     {
-        parent::__construct($username, $password);
-        $this->config = $config;
-    }
-
-    /**
-     * @param array|null $config
-     * @return $this
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-        return $this;
+        $this->validUsername = $validUsername;
+        $this->validPassword = $validPassword;
     }
 
     /**
@@ -57,10 +42,8 @@ class Config extends Iface
      */
     public function authenticate()
     {
-        $cUserKey = $this->config['system.auth.config.username'];
-        $cPassKey = $this->config['system.auth.config.password'];
-        if ($cUserKey && $cPassKey) {
-            if ($this->getUsername() === $cUserKey && $this->getPassword() === $cPassKey) {
+        if ($this->validUsername && $this->validPassword) {
+            if ($this->getUsername() === $this->validUsername && $this->getPassword() === $this->validPassword) {
                 return new Result(Result::SUCCESS, $this->getUsername());
             }
         }

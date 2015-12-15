@@ -45,22 +45,18 @@ class Digest extends Iface
     /**
      * Constructor
      *
-     * @param  string $username The username of the account being authenticated
-     * @param  string $password The password of the account being authenticated
-     * @param array $config
+     * @param string $file
+     * @param string $realm
+     * @param $scheme
      * @throws \Tk\Auth\Exception
      */
-    public function __construct($username = null, $password = null, $config = array())
+    public function __construct($file, $realm, $scheme)
     {
-        parent::__construct($username, $password);
-
-
         throw new \Tk\Auth\Exception('This ain`t working yet, fix it!');
-        
-        
-        $this->file = !empty($config['system.auth.digest.file']) ? $config['system.auth.digest.file'] : '';
-        $this->scheme = !empty($config['system.auth.digest.scheme']) ? $config['system.auth.digest.scheme'] : '';
-        $this->realm = !empty($config['system.auth.digest.realm']) ? $config['system.auth.digest.realm'] : '';
+                
+        $this->file = $file;
+        $this->scheme = $scheme;
+        $this->realm = $realm;
         
         if (!is_file($this->file)) {
             throw new \Tk\Auth\Exception('Cannot locate digest file: ' . $this->file);
@@ -83,7 +79,7 @@ class Digest extends Iface
         $idLength = strlen($id);
         while ($line = trim(fgets($fileHandle))) {
             if (substr($line, 0, $idLength) === $id) {
-                if ( $this->_secureStringCompare(substr($line, -32), \Tk\Auth::hash(sprintf('%s:%s:%s', $this->getUsername(), $this->getRealm(), $this->getPassword()), 'md5')) ) { 
+                if ( $this->_secureStringCompare(substr($line, -32), self::hash(sprintf('%s:%s:%s', $this->getUsername(), $this->getRealm(), $this->getPassword()), 'md5')) ) { 
                     return new Result(Result::SUCCESS, $this->getUsername());
                 } else {
                     return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Username or Password incorrect');
