@@ -54,6 +54,24 @@ class Auth
     }
 
     /**
+     * Create a hash using the config defined function
+     * NOTE:
+     *   If the has function is changed after the site
+     *   is installed major problems can occur to fix
+     *   you will have to reset all user passwords.
+     *
+     *  Find the hash functions available via hash_algos();
+     *
+     * @param string $str
+     * @param string $hashFunc
+     * @return string (Hashed string to store or compare)
+     */
+    public static function hash($str, $hashFunc = 'md5')
+    {
+        return hash($hashFunc, $str);
+    }
+
+    /**
      * Returns true if and only if an identity is available from storage
      *
      * @return bool

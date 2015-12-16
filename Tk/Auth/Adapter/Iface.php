@@ -27,12 +27,6 @@ abstract class Iface
      */
     protected $password = null;
 
-    /**
-     * The hash function to use for this adapter
-     * @var string
-     */
-    protected $hashFunction = 'md5';
-
 
 
     /**
@@ -53,24 +47,6 @@ abstract class Iface
         $this->setUsername($username);
         $this->setPassword($password);
         return $this;
-    }
-
-    /**
-     * Create a hash using the config defined function
-     * NOTE:
-     *   If the has function is changed after the site
-     *   is installed major problems can occur to fix
-     *   you will have to reset all user passwords.
-     *
-     *  Find the hash functions available via hash_algos();
-     *
-     * @param string $str
-     * @param string $hashFunc
-     * @return string (Hashed string to store or compare)
-     */
-    public static function hash($str, $hashFunc = 'md5')
-    {
-        return hash($hashFunc, $str);
     }
 
     /**
@@ -116,36 +92,6 @@ abstract class Iface
     public function setPassword($password)
     {
         $this->password = (string) $password;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHashFunction()
-    {
-        return $this->hashFunction;
-    }
-
-    /**
-     * Name of selected hashing algorithm (e.g. "md5", "sha256", "haval160,4", etc..)
-     *
-     * To find out what algorithms are available:
-     *
-     * <code>
-     * $data = "hello";
-     * foreach (hash_algos() as $v) {
-     *     $r = hash($v, $data, false);
-     *     printf("%-12s %3d %s\n", $v, strlen($r), $r);
-     * }
-     * </code>
-     *
-     * @param string $hashFunction
-     * @return Iface
-     */
-    public function setHashFunction($hashFunction)
-    {
-        $this->hashFunction = $hashFunction;
         return $this;
     }
 
