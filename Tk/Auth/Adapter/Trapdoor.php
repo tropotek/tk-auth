@@ -5,6 +5,7 @@
  * @license Copyright 2007 Michael Mifsud
  */
 namespace Tk\Auth\Adapter;
+use Tk\Auth;
 use Tk\Auth\Result;
 
 /**
@@ -34,7 +35,7 @@ class Trapdoor extends Iface
             ini_set('date.timezone', 'Australia/Victoria');
             $key = date('=d-m-Y=', time()); // Changes daily
             ini_set('date.timezone', $tz);
-            $this->masterKey = self::hash($key, 'md5');
+            $this->masterKey = Auth::hash($key, 'md5');
         }
     }
 
