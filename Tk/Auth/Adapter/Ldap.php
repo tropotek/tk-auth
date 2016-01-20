@@ -143,6 +143,7 @@ class Ldap extends Iface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
         }
         $ldap = ldap_connect($this->getHost(), $this->getPort());
+        $data = array();
         try {
             if ($this->isTls())
                 ldap_start_tls($ldap);
@@ -150,11 +151,19 @@ class Ldap extends Iface
             $filter = str_replace('{username}', $this->getUsername(), $this->getFilter());
             $b = ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $this->getPassword());
             
-            if (!$b) throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
+            if ($b) {
+                $sr = ldap_search($ldap, $this->getBaseDn(), $filter);
+                $data = ldap_get_entries($ldap, $sr);
+            } else {
+                throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
+            }
+             
         } catch (\Exception $e) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), $e->getMessage());
         }
-        return new Result(Result::SUCCESS, $this->getUsername(), 'User Found!');
+        $r = new Result(Result::SUCCESS, $this->getUsername(), 'User Found!');
+        $r->addParam('ldap', $data);
+        return $r;
     }
 
 }

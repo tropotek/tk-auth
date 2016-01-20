@@ -10,6 +10,9 @@ namespace Tk\Auth;
  */
 class Result
 {
+    
+    use \Tk\Traits\Parameter;
+    
     /**
      * General Failure
      */
