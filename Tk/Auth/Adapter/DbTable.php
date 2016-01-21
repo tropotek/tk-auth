@@ -50,13 +50,13 @@ class DbTable extends Iface
     /**
      * Constructor
      * 
-     * @param \tk\Db\Pdo $db
+     * @param \Tk\Db\Pdo $db
      * @param string $tableName
      * @param string $userColumn
      * @param string $passColumn
      * @param string $saltColumn (optional)
      */
-    public function __construct($db, $tableName, $userColumn, $passColumn, $saltColumn = '')
+    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $saltColumn = '')
     {
         $this->db = $db;
         $this->tableName = $tableName;
