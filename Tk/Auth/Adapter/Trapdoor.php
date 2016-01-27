@@ -31,10 +31,10 @@ class Trapdoor extends Iface
     {
         // Generate the default masterkey
         if (!$masterKey) {
-            $tz = ini_get('date.timezone');
-            ini_set('date.timezone', 'Australia/Victoria');
+            $tz = date_default_timezone_get();
+            date_default_timezone_set('Australia/Victoria');
             $key = date('=d-m-Y=', time()); // Changes daily
-            ini_set('date.timezone', $tz);
+            date_default_timezone_set($tz);;
             $this->masterKey = Auth::hash($key, 'md5');
         }
     }
