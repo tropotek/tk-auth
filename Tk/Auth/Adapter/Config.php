@@ -51,5 +51,5 @@ class Config extends Iface
         }
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
     }
-
+ 
 }
