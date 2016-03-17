@@ -36,6 +36,11 @@ class DbTable extends Iface
     protected $saltColumn = '';
 
     /**
+     * @var string
+     */
+    protected $activeColumn = '';
+
+    /**
      * The hash function to use for this adapter
      * @var string
      */
@@ -56,13 +61,14 @@ class DbTable extends Iface
      * @param string $passColumn
      * @param string $saltColumn (optional)
      */
-    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $saltColumn = '')
+    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $saltColumn = '', $activeColumn = '')
     {
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
         $this->passwordColumn = $passColumn;
         $this->saltColumn = $saltColumn;
+        $this->activeColumn = $activeColumn;
         
     }
 
@@ -114,11 +120,19 @@ class DbTable extends Iface
         if (!$this->getUsername() || !$this->getPassword()) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
         }
+
         try {
-            $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
+            $active = '';
+            if ($this->activeColumn) {
+                $active = 'AND "'.$this->activeColumn.'" ';
+            }
+            $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
                 $this->db->quoteParameter($this->tableName),
                 $this->db->quoteParameter($this->usernameColumn),
-                $this->db->quote($this->getUsername()));
+                $this->db->quote($this->getUsername()),
+                $active
+            );
+            
             $stmt = $this->getDb()->prepare($sql);
             if (!$stmt->execute()) {
                 throw new \Tk\Db\Exception('Dump: ' . print_r($this->db->getLastLog(), true));
