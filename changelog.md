@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.0.2 [2016-03-23]:
+-------------------------------
+ - Fixed LTI classes and logic
+ - Fixed date timezone issues with timestamp use \Tk\Date::parse({timestamp})
+
+
 Ver 2.0.1 [2016-03-08]:
 -------------------------------
  - Added LTI sql to install.pg.sql
