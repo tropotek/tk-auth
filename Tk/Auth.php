@@ -130,7 +130,7 @@ class Auth
             $this->clearIdentity();
         }
         $loginResult = $adapter->authenticate();
-        if ($loginResult->isValid()) {
+        if ($loginResult && $loginResult->isValid()) {
             $this->getStorage()->write($loginResult->getIdentity());
         }
         return $loginResult;
