@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.0.3 [2016-04-14]:
+-------------------------------
+ - Finalised base code for uni apps
+
+
 Ver 2.0.2 [2016-03-23]:
 -------------------------------
  - Fixed LTI classes and logic
