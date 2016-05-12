@@ -34,7 +34,7 @@ class Config extends Iface
     {
         $this->validUsername = $validUsername;
         $this->validPassword = $validPassword;
-            vd($this->validUsername, $this->validPassword);
+        //vd($this->validUsername, $this->validPassword);
     }
 
     /**
@@ -44,7 +44,7 @@ class Config extends Iface
     public function authenticate()
     {
         if ($this->validUsername && $this->validPassword) {
-            vd($this->getUsername(), $this->validUsername , $this->getPassword(), $this->validPassword);
+            //vd($this->getUsername(), $this->validUsername , $this->getPassword(), $this->validPassword);
             if ($this->getUsername() === $this->validUsername && $this->getPassword() === $this->validPassword) {
                 return new Result(Result::SUCCESS, $this->getUsername());
             }
