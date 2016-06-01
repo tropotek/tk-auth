@@ -1,10 +1,6 @@
 <?php
-/*
- * @author Michael Mifsud <info@tropotek.com>
- * @link http://www.tropotek.com/
- * @license Copyright 2007 Michael Mifsud
- */
 namespace Tk\Auth\Adapter;
+
 use Tk\Auth\Result;
 
 /**
@@ -18,10 +14,17 @@ use Tk\Auth\Result;
  *   $config['system.auth.digest.realm']    = '';
  *   $config['system.auth.digest.scheme']    = 'basic';
  *
- * 
+ * This adapter requires that the data values have been set
+ * ```
+ * $adapter->replace(array('username' => $value, 'password' => $password));
+ * ```
  * 
  * @link https://en.wikipedia.org/wiki/Digest_access_authentication
- * @todo THis needs tpo be checked, this code will not work securely.
+ * @todo This needs to be checked, this code will not work securely.
+ *
+ * @author Michael Mifsud <info@tropotek.com>
+ * @link http://www.tropotek.com/
+ * @license Copyright 2016 Michael Mifsud
  */
 class Digest extends Iface
 {
@@ -52,15 +55,14 @@ class Digest extends Iface
      */
     public function __construct($file, $realm, $scheme)
     {
-        throw new \Tk\Auth\Exception('This ain`t working yet, fix it!');
-                
+        parent::__construct();
         $this->file = $file;
         $this->scheme = $scheme;
         $this->realm = $realm;
-        
         if (!is_file($this->file)) {
             throw new \Tk\Auth\Exception('Cannot locate digest file: ' . $this->file);
         }
+        $this->setHashFunction('md5');
     }
 
 
@@ -72,21 +74,24 @@ class Digest extends Iface
      */
     public function authenticate()
     {
-        if (false === ($fileHandle = @fopen($this->getDigestFile(), 'r'))) {
-            return new Result(Result::FAILURE, $this->getUsername(), 'System authentication error.');
+        $username = $this->get('username');
+        $password = $this->get('password');
+        
+        if (false === ($fileHandle = @fopen($this->file, 'r'))) {
+            return new Result(Result::FAILURE, $username, 'System authentication error.');
         }
-        $id = $this->getUsername() . ':' . $this->getRealm();
+        $id = $username . ':' . $this->realm;
         $idLength = strlen($id);
         while ($line = trim(fgets($fileHandle))) {
             if (substr($line, 0, $idLength) === $id) {
-                if ( $this->_secureStringCompare(substr($line, -32), self::hash(sprintf('%s:%s:%s', $this->getUsername(), $this->getRealm(), $this->getPassword()), 'md5')) ) { 
-                    return new Result(Result::SUCCESS, $this->getUsername());
+                if ( $this->_secureStringCompare(substr($line, -32), $this->hash(sprintf('%s:%s:%s', $username, $this->realm, $password))) ) { 
+                    return new Result(Result::SUCCESS, $username);
                 } else {
-                    return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Username or Password incorrect');
+                    return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Username or Password incorrect');
                 }
             }
         }
-        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $this->getUsername(), 'Invalid username or password.');
+        return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $username, 'Invalid username or password.');
     }
 
     /**

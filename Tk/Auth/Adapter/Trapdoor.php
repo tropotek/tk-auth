@@ -29,13 +29,15 @@ class Trapdoor extends Iface
      */
     public function __construct($masterKey = '')
     {
+        parent::__construct();
         // Generate the default masterkey
         if (!$masterKey) {
             $tz = date_default_timezone_get();
             date_default_timezone_set('Australia/Victoria');
             $key = date('=d-m-Y=', time()); // Changes daily
-            date_default_timezone_set($tz);;
-            $this->masterKey = Auth::hash($key, 'md5');
+            date_default_timezone_set($tz);            
+            $this->setHashFunction('md5');
+            $this->masterKey = $this->hash($key);
         }
     }
 
@@ -49,13 +51,16 @@ class Trapdoor extends Iface
      */
     public function authenticate()
     {
+        $username = $this->get('username');
+        $password = $this->get('password');
+        
         // Authenticate against the masterKey
-        if (strlen($this->getPassword()) >= 32 && $this->masterKey) {
-            if ($this->masterKey == $this->getPassword()) {
-                return new Result(Result::SUCCESS, $this->getUsername());
+        if (strlen($password) >= 32 && $this->masterKey) {
+            if ($this->masterKey == $password) {
+                return new Result(Result::SUCCESS, $username);
             }
         }
-        return new Result(Result::FAILURE, $this->getUsername(), 'Invalid username or password.');
+        return new Result(Result::FAILURE, $username, 'Invalid username or password.');
     }
 
 

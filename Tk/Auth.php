@@ -36,42 +36,6 @@ class Auth
     }
 
     /**
-     * Create a random password
-     *
-     * @param int $length
-     * @return string
-     */
-    public static function createPassword($length = 8)
-    {
-        $chars = '234567890abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
-        $i = 0;
-        $password = '';
-        while ($i <= $length) {
-            $password .= $chars[mt_rand(0, strlen($chars) - 1)];
-            $i++;
-        }
-        return $password;
-    }
-
-    /**
-     * Create a hash using the config defined function
-     * NOTE:
-     *   If the has function is changed after the site
-     *   is installed major problems can occur to fix
-     *   you will have to reset all user passwords.
-     *
-     *  Find the hash functions available via hash_algos();
-     *
-     * @param string $str
-     * @param string $hashFunc
-     * @return string (Hashed string to store or compare)
-     */
-    public static function hash($str, $hashFunc = 'md5')
-    {
-        return hash($hashFunc, $str);
-    }
-
-    /**
      * Returns true if and only if an identity is available from storage
      *
      * @return bool

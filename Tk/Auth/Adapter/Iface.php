@@ -12,22 +12,14 @@ namespace Tk\Auth\Adapter;
  *
  * @package Tk\Auth\Adapter
  */
-abstract class Iface
+abstract class Iface extends \Tk\Collection
 {
 
     /**
-     * The username of the account being authenticated.
-     * @var string
+     * The hash function to use for this adapter
+     * @var callable
      */
-    protected $username = null;
-
-    /**
-     * The password of the account being authenticated.
-     * @var string
-     */
-    protected $password = null;
-
-
+    private $hashFunction = '';
 
     /**
      * Performs an authentication attempt
@@ -38,61 +30,45 @@ abstract class Iface
     abstract public function authenticate();
 
     /**
-     * @param string $username
-     * @param string $password
-     * @return $this
-     */
-    public function setCredentials($username, $password) 
-    {
-        $this->setUsername($username);
-        $this->setPassword($password);
-        return $this;
-    }
-
-    /**
-     * Returns the username of the account being authenticated, or
-     * NULL if none is set.
+     * Name of selected hashing algorithm (e.g. "md5", "sha256", "haval160,4", etc..)
      *
-     * @return string|null
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * Sets the username for binding
+     * Or alternatively a callable object to execute
+     * 
+     * To find out what algorithms are available:
      *
-     * @param  string $username The username for binding
+     * <code>
+     * $data = "hello";
+     * foreach (hash_algos() as $v) {
+     *     $r = hash($v, $data, false);
+     *     printf("%-12s %3d %s\n", $v, strlen($r), $r);
+     * }
+     * </code>
+     *
+     * @param string|callable $hashFunction
      * @return Iface
      */
-    public function setUsername($username)
+    public function setHashFunction($hashFunction)
     {
-        $this->username = (string) $username;
+        $this->hashFunction = $hashFunction;
         return $this;
+    }
+    
+    public function getHashFunction()
+    {
+        return $this->hashFunction;
     }
 
     /**
-     * Returns the password of the account being authenticated, or
-     * NULL if none is set.
+     * Execute the supplied hash function
      *
-     * @return string|null
+     * @param $str
+     * @return mixed
      */
-    public function getPassword()
+    protected function hash($str)
     {
-        return $this->password;
+        if (is_callable($this->getHashFunction())) {
+            $str = call_user_func_array($this->getHashFunction(), array($str));
+        }
+        return $str;
     }
-
-    /**
-     * Sets the password for the account
-     *
-     * @param  string $password The password of the account being authenticated
-     * @return Iface
-     */
-    public function setPassword($password)
-    {
-        $this->password = (string) $password;
-        return $this;
-    }
-
 }

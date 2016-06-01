@@ -11,6 +11,13 @@ use Tk\Auth\Result;
  * LDAP Authentication adapter
  * 
  *
+ *
+ * This adapter requires that the data values have been set
+ * ```
+ * $adapter->replace(array('username' => $value, 'password' => $password));
+ * ```
+ * 
+ * 
  */
 class Ldap extends Iface
 {
@@ -33,6 +40,7 @@ class Ldap extends Iface
      */
     public function __construct($host, $baseDn, $filter, $port = 389, $tls = false)
     {
+        parent::__construct();
         $this->setHost($host);
         $this->setBaseDn($baseDn);
         $this->setFilter($filter);
@@ -139,8 +147,11 @@ class Ldap extends Iface
      */
     public function authenticate()
     {
-        if (!$this->getUsername() || !$this->getPassword()) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), 'Invalid username or password.');
+        $username = $this->get('username');
+        $password = $this->get('password');
+        
+        if (!$username || !$password) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         $ldap = ldap_connect($this->getHost(), $this->getPort());
         $data = array();
@@ -148,8 +159,8 @@ class Ldap extends Iface
             if ($this->isTls())
                 ldap_start_tls($ldap);
             
-            $filter = str_replace('{username}', $this->getUsername(), $this->getFilter());
-            $b = ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $this->getPassword());
+            $filter = str_replace('{username}', $username, $this->getFilter());
+            $b = ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $password);
             
             if ($b) {
                 $sr = ldap_search($ldap, $this->getBaseDn(), $filter);
@@ -159,10 +170,10 @@ class Ldap extends Iface
             }
              
         } catch (\Exception $e) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->getUsername(), $e->getMessage());
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, $e->getMessage());
         }
-        $r = new Result(Result::SUCCESS, $this->getUsername(), 'User Found!');
-        $r->addParam('ldap', $data);
+        $r = new Result(Result::SUCCESS, $username, 'User Found!');
+        $r->setParam('ldap', $data);
         return $r;
     }
 
