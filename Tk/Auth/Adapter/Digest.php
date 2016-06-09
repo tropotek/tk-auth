@@ -62,7 +62,7 @@ class Digest extends Iface
         if (!is_file($this->file)) {
             throw new \Tk\Auth\Exception('Cannot locate digest file: ' . $this->file);
         }
-        $this->setHashFunction('md5');
+        //$this->setHashFunction('md5');
     }
 
 
@@ -84,7 +84,7 @@ class Digest extends Iface
         $idLength = strlen($id);
         while ($line = trim(fgets($fileHandle))) {
             if (substr($line, 0, $idLength) === $id) {
-                if ( $this->_secureStringCompare(substr($line, -32), $this->hash(sprintf('%s:%s:%s', $username, $this->realm, $password))) ) { 
+                if ( $this->_secureStringCompare(substr($line, -32), hash('md5', sprintf('%s:%s:%s', $username, $this->realm, $password))) ) { 
                     return new Result(Result::SUCCESS, $username);
                 } else {
                     return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Username or Password incorrect');

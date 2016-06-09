@@ -47,16 +47,15 @@ class Config extends Iface
      */
     public function authenticate()
     {
+        $username = $this->get('username');
+        $password = $this->get('password');
+        
         if ($this->requiredUsername && $this->requiredPassword) {
-            $pwd = $this->get('password');
-            if ($this->getHashFunction()) {
-                $pwd = $this->hash($pwd);
-            }
-            if ($this->get('username') == $this->requiredUsername && $pwd == $this->requiredPassword) {
-                return new Result(Result::SUCCESS, $this->get('username'));
+            if ($username == $this->requiredUsername && $password == $this->requiredPassword) {
+                return new Result(Result::SUCCESS, $username);
             }
         }
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $this->get('username'), 'Invalid username or password.');
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
     }
  
 }

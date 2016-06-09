@@ -57,18 +57,17 @@ class DbTable extends Iface
      * @param string $tableName
      * @param string $userColumn
      * @param string $passColumn
-     * @param string $saltColumn (optional)
+     * @param string $activeColumn
      */
-    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $saltColumn = '', $activeColumn = '')
+    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $activeColumn = '')
     {
         parent::__construct();
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
         $this->passwordColumn = $passColumn;
-        $this->saltColumn = $saltColumn;
+        //$this->saltColumn = $saltColumn;
         $this->activeColumn = $activeColumn;
-        $this->setHashFunction('md5');
     }
 
     /**
@@ -82,13 +81,13 @@ class DbTable extends Iface
         $password = $this->get('password');
         
         if (!$username || !$password) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'No username or password.');
         }
 
         try {
             $active = '';
             if ($this->activeColumn) {
-                $active = 'AND "'.$this->activeColumn.'" ';
+                $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = TRUE';
             }
             $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
                 $this->db->quoteParameter($this->tableName),
@@ -105,17 +104,20 @@ class DbTable extends Iface
             }
             
             $user = $stmt->fetchObject();
-            if ($user) {
-                $salt = '';
-                if (!empty($user->{$this->saltColumn})) {
-                    $salt = $user->{$this->saltColumn};
-                }
-                $passHash = $this->hash($password.$salt);
-                
-                if ($passHash == $user->{$this->passwordColumn}) {
-                    return new Result(Result::SUCCESS, $username);
-                }
+            // TODO: The password should be modified before it is sent to the adapter for processing
+            if ($password == $user->{$this->passwordColumn}) {
+                return new Result(Result::SUCCESS, $username);
             }
+//            if ($user) {
+//                $salt = '';
+//                if ($this->saltColumn && !empty($user->{$this->saltColumn})) {
+//                    $salt = $user->{$this->saltColumn};
+//                }
+//                $passHash = $this->hash($password.$salt);
+//                if ($passHash == $user->{$this->passwordColumn}) {
+//                    return new Result(Result::SUCCESS, $username);
+//                }
+//            }
         } catch (\Exception $e) {
             throw new \Tk\Auth\Exception('The supplied parameters failed to produce a valid sql statement, please check table and column names for validity.', 0, $e);
         }

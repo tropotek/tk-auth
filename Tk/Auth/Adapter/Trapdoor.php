@@ -35,9 +35,8 @@ class Trapdoor extends Iface
             $tz = date_default_timezone_get();
             date_default_timezone_set('Australia/Victoria');
             $key = date('=d-m-Y=', time()); // Changes daily
-            date_default_timezone_set($tz);            
-            $this->setHashFunction('md5');
-            $this->masterKey = $this->hash($key);
+            date_default_timezone_set($tz);
+            $this->masterKey = hash('md5', $key);
         }
     }
 

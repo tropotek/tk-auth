@@ -19,7 +19,7 @@ abstract class Iface extends \Tk\Collection
      * The hash function to use for this adapter
      * @var callable
      */
-    private $hashFunction = '';
+    //private $hashFunction = '';
 
     /**
      * Performs an authentication attempt
@@ -29,6 +29,11 @@ abstract class Iface extends \Tk\Collection
      */
     abstract public function authenticate();
 
+    
+    
+    // TODO: All hash methods are to be removed from adapters and that responsability is to reside externally in the User object or elsewhere
+    
+    
     /**
      * Name of selected hashing algorithm (e.g. "md5", "sha256", "haval160,4", etc..)
      *
@@ -47,16 +52,16 @@ abstract class Iface extends \Tk\Collection
      * @param string|callable $hashFunction
      * @return Iface
      */
-    public function setHashFunction($hashFunction)
-    {
-        $this->hashFunction = $hashFunction;
-        return $this;
-    }
-    
-    public function getHashFunction()
-    {
-        return $this->hashFunction;
-    }
+//    public function setHashFunction($hashFunction)
+//    {
+//        $this->hashFunction = $hashFunction;
+//        return $this;
+//    }
+//    
+//    public function getHashFunction()
+//    {
+//        return $this->hashFunction;
+//    }
 
     /**
      * Execute the supplied hash function
@@ -64,11 +69,11 @@ abstract class Iface extends \Tk\Collection
      * @param $str
      * @return mixed
      */
-    protected function hash($str)
-    {
-        if (is_callable($this->getHashFunction())) {
-            $str = call_user_func_array($this->getHashFunction(), array($str));
-        }
-        return $str;
-    }
+//    protected function hash($str)
+//    {
+//        if (is_callable($this->getHashFunction())) {
+//            $str = call_user_func_array($this->getHashFunction(), array($str));
+//        }
+//        return $str;
+//    }
 }
