@@ -148,13 +148,14 @@ class Ldap extends Iface
     {
         $username = $this->get('username');
         $password = $this->get('password');
+        $data = array();
         
         if (!$username || !$password) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
-        $ldap = @ldap_connect($this->getHost(), $this->getPort());
-        $data = array();
         try {
+            $ldap = @ldap_connect($this->getHost(), $this->getPort());
+            
             if ($this->isTls())
                 @ldap_start_tls($ldap);
             

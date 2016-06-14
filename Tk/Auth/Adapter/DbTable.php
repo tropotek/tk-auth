@@ -105,7 +105,7 @@ class DbTable extends Iface
             
             $user = $stmt->fetchObject();
             // TODO: The password should be modified before it is sent to the adapter for processing
-            if ($password == $user->{$this->passwordColumn}) {
+            if ($user && $password == $user->{$this->passwordColumn}) {
                 return new Result(Result::SUCCESS, $username);
             }
 //            if ($user) {
