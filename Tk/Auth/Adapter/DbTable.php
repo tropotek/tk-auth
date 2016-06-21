@@ -37,17 +37,17 @@ class DbTable extends Iface
     /**
      * @var string
      */
-    protected $saltColumn = '';
-
-    /**
-     * @var string
-     */
     protected $activeColumn = '';
 
     /**
      * @var \Tk\Db\Pdo
      */
     protected $db = null;
+
+    /**
+     * @var callable
+     */
+    protected $hashCallback = null;
 
 
     /**
@@ -66,8 +66,61 @@ class DbTable extends Iface
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
         $this->passwordColumn = $passColumn;
-        //$this->saltColumn = $saltColumn;
         $this->activeColumn = $activeColumn;
+    }
+
+    /**
+     * If a hash function is set then that is used to has a password.
+     * The password and the user stdClass is sent to the function for hashing.
+     * 
+     * @param $callable
+     * @info This may not be the most secure method for opensource projects???
+     */
+    public function setHashCallback($callable) 
+    {
+        $this->hashCallback = $callable;
+    }
+
+    /**
+     * Override this method for more secure password encoding
+     *
+     * @param $password
+     * @param \stdClass $user
+     * @return string
+     */
+    public function hashPassword($password, $user = null)
+    {
+        if ($this->hashCallback) {
+            return call_user_func_array($this->hashCallback, array($password, $user));
+        }
+        return hash('md5', $password);
+    }
+
+    /**
+     * @param $username
+     * @return \stdClass
+     */
+    protected function getUser($username)
+    {
+        $active = '';
+        if ($this->activeColumn) {
+            $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = TRUE';
+        }
+        $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
+            $this->db->quoteParameter($this->tableName),
+            $this->db->quoteParameter($this->usernameColumn),
+            $this->db->quote($username),
+            $active
+        );
+
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt->execute()) {
+            $errorInfo = $this->db->errorInfo();
+            $e = new \Tk\Db\Exception($errorInfo[2]);
+            $e->setDump('Dump: ' . print_r($this->db->getLastLog(), true));
+        }
+
+        return $stmt->fetchObject();
     }
 
     /**
@@ -85,39 +138,11 @@ class DbTable extends Iface
         }
 
         try {
-            $active = '';
-            if ($this->activeColumn) {
-                $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = TRUE';
-            }
-            $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
-                $this->db->quoteParameter($this->tableName),
-                $this->db->quoteParameter($this->usernameColumn),
-                $this->db->quote($username),
-                $active
-            );
-            
-            $stmt = $this->db->prepare($sql);
-            if (!$stmt->execute()) {
-                $errorInfo = $this->db->errorInfo();
-                $e = new \Tk\Db\Exception($errorInfo[2]);
-                $e->setDump('Dump: ' . print_r($this->db->getLastLog(), true));
-            }
-            
-            $user = $stmt->fetchObject();
+            $user = $this->getUser($username);
             // TODO: The password should be modified before it is sent to the adapter for processing
-            if ($user && $password == $user->{$this->passwordColumn}) {
+            if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
                 return new Result(Result::SUCCESS, $username);
             }
-//            if ($user) {
-//                $salt = '';
-//                if ($this->saltColumn && !empty($user->{$this->saltColumn})) {
-//                    $salt = $user->{$this->saltColumn};
-//                }
-//                $passHash = $this->hash($password.$salt);
-//                if ($passHash == $user->{$this->passwordColumn}) {
-//                    return new Result(Result::SUCCESS, $username);
-//                }
-//            }
         } catch (\Exception $e) {
             throw new \Tk\Auth\Exception('The supplied parameters failed to produce a valid sql statement, please check table and column names for validity.', 0, $e);
         }

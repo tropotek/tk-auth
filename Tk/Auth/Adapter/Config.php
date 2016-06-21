@@ -41,6 +41,19 @@ class Config extends Iface
         $this->requiredPassword = $requiredPassword;
     }
 
+
+    /**
+     * Override this method for more secure password encoding
+     *
+     * @param $password
+     * @return string
+     */
+    public function hashPassword($password)
+    {
+        return $password;
+    }
+    
+    
     /**
      *
      * @return Result
@@ -51,7 +64,7 @@ class Config extends Iface
         $password = $this->get('password');
         
         if ($this->requiredUsername && $this->requiredPassword) {
-            if ($username == $this->requiredUsername && $password == $this->requiredPassword) {
+            if ($username == $this->requiredUsername && $this->hashPassword($password) == $this->requiredPassword) {
                 return new Result(Result::SUCCESS, $username);
             }
         }
