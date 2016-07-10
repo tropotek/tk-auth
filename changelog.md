@@ -1,5 +1,15 @@
 #CHANGELOG#
 
+Ver 2.0.4 [2016-07-10]:
+-------------------------------
+ - More wiki updates, updated the Auth adapters too
+ - Finished up the user system a bit
+ - Added getPage to Controller interface
+ - Finalised base template site
+ - Fixed calles to new DB objects
+ - Updated code, added an update.md with info for the updated codes...
+
+
 Ver 2.0.3 [2016-04-14]:
 -------------------------------
  - Finalised base code for uni apps
