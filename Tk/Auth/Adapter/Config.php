@@ -27,6 +27,11 @@ class Config extends Iface
 
     protected $requiredPassword = '';
 
+    /**
+     * @var callable
+     */
+    protected $hashCallback = null;
+
 
     /**
      * Constructor
@@ -41,15 +46,31 @@ class Config extends Iface
         $this->requiredPassword = $requiredPassword;
     }
 
+    /**
+     * If a hash function is set then that is used to has a password.
+     * The password and the user stdClass is sent to the function for hashing.
+     *
+     * @param $callable
+     * @return $this
+     */
+    public function setHashCallback($callable)
+    {
+        $this->hashCallback = $callable;
+        return $this;
+    }
 
     /**
      * Override this method for more secure password encoding
      *
      * @param $password
+     * @param \stdClass $user
      * @return string
      */
-    public function hashPassword($password)
+    public function hashPassword($password, $user = null)
     {
+        if ($this->hashCallback) {
+            return call_user_func_array($this->hashCallback, array($password, $user));
+        }
         return $password;
     }
     

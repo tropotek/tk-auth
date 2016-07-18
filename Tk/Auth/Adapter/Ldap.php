@@ -172,7 +172,7 @@ class Ldap extends Iface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, $e->getMessage());
         }
         $r = new Result(Result::SUCCESS, $username, 'User Found!');
-        $r->setParam('ldap', $data);
+        $r->set('ldap', $data);
         return $r;
     }
 

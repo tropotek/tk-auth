@@ -72,13 +72,14 @@ class DbTable extends Iface
     /**
      * If a hash function is set then that is used to has a password.
      * The password and the user stdClass is sent to the function for hashing.
-     * 
+     *
      * @param $callable
-     * @info This may not be the most secure method for opensource projects???
+     * @return $this
      */
     public function setHashCallback($callable) 
     {
         $this->hashCallback = $callable;
+        return $this;
     }
 
     /**
@@ -104,7 +105,7 @@ class DbTable extends Iface
     {
         $active = '';
         if ($this->activeColumn) {
-            $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = TRUE';
+            $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = 1';
         }
         $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
             $this->db->quoteParameter($this->tableName),
@@ -139,7 +140,7 @@ class DbTable extends Iface
 
         try {
             $user = $this->getUser($username);
-            // TODO: The password should be modified before it is sent to the adapter for processing
+            // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
                 return new Result(Result::SUCCESS, $username);
             }

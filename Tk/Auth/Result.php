@@ -8,7 +8,7 @@ namespace Tk\Auth;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Result
+class Result extends \Tk\Collection
 {
     
     /**
@@ -65,10 +65,6 @@ class Result
      */
     protected $messages = array();
 
-    /**
-     * @var array|\ArrayAccess
-     */
-    protected $paramList = array();
 
 
 
@@ -129,49 +125,5 @@ class Result
             $this->messages = array('messages' => $this->messages);
         }
         return $this->messages;
-    }
-
-    /**
-     * Get a parameter from the array
-     *
-     * @param $name
-     * @return bool
-     */
-    public function getParam($name)
-    {
-        if (!empty($this->paramList[$name])) {
-            return $this->paramList[$name];
-        }
-    }
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @return $this
-     */
-    public function setParam($name, $value)
-    {
-        $this->paramList[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Get the param array
-     *
-     * @return array
-     */
-    public function getParamList()
-    {
-        return $this->paramList;
-    }
-
-    /**
-     * @param array $params
-     * @return $this
-     */
-    public function setParamList($params)
-    {
-        $this->paramList = $params;
-        return $this;
     }
 }
