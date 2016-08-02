@@ -91,6 +91,7 @@ class DbTable extends Iface
      */
     public function hashPassword($password, $user = null)
     {
+        vd($this->hashCallback);
         if ($this->hashCallback) {
             return call_user_func_array($this->hashCallback, array($password, $user));
         }
@@ -113,7 +114,7 @@ class DbTable extends Iface
             $this->db->quote($username),
             $active
         );
-
+vd($sql);
         $stmt = $this->db->prepare($sql);
         if (!$stmt->execute()) {
             $errorInfo = $this->db->errorInfo();
@@ -140,6 +141,7 @@ class DbTable extends Iface
 
         try {
             $user = $this->getUser($username);
+            vd($user);
             // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
                 return new Result(Result::SUCCESS, $username);
