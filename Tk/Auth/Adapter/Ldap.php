@@ -155,7 +155,6 @@ class Ldap extends Iface
         }
         try {
             $ldap = @ldap_connect($this->getHost(), $this->getPort());
-            
             if ($this->isTls())
                 @ldap_start_tls($ldap);
             
