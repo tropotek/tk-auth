@@ -1,5 +1,16 @@
 #CHANGELOG#
 
+Ver 2.0.5 [2016-09-05]:
+-------------------------------
+ - Moved common files to tk-site
+ - Modified user pages and login identity value
+ - Added new tk mail lib
+ - Implemented lib into project
+ - Updating the user/roles system
+ - Changed boolean to integer in postgress sql files.
+ - Change php version check to gt php5.0.0
+
+
 Ver 2.0.4 [2016-07-10]:
 -------------------------------
  - More wiki updates, updated the Auth adapters too
