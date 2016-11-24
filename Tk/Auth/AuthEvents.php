@@ -14,7 +14,6 @@ final class AuthEvents
      * All Authentication should take place here.
      *
      * @event \App\Event\AuthEvent
-     * @var string
      */
     const LOGIN = 'auth.onLogin';
 
@@ -22,7 +21,6 @@ final class AuthEvents
      * Called when a user successfully logs in
      *
      * @event \App\Event\AuthEvent
-     * @var string
      */
     const LOGIN_SUCCESS = 'auth.onLoginSuccess';
 
@@ -30,7 +28,6 @@ final class AuthEvents
      * Called when a user logs out of the system
      *
      * @event \App\Event\AuthEvent
-     * @var string
      */
     const LOGOUT = 'auth.onLogout';
 
@@ -38,7 +35,6 @@ final class AuthEvents
      * Called when a user wants to recover their account password
      *
      * @event \Tk\EventDispatcher\Event
-     * @var string
      */
     const RECOVER = 'auth.onRecover';
 
@@ -46,7 +42,6 @@ final class AuthEvents
      * Called when a new user submits a registration request
      *
      * @event \Tk\EventDispatcher\Event
-     * @var string
      */
     const REGISTER = 'auth.onRegister';
 
@@ -54,7 +49,6 @@ final class AuthEvents
      * Called when a user triggers the registration confirmation request
      *
      * @event \Tk\EventDispatcher\Event
-     * @var string
      */
     const REGISTER_CONFIRM = 'auth.onRegisterConfirm';
 
