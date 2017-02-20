@@ -33,10 +33,18 @@ final class AuthEvents
 
     /**
      * Called when a user wants to recover their account password
+     * This should email a message with a URL to set the new password for the account
      *
      * @event \Tk\EventDispatcher\Event
      */
     const RECOVER = 'auth.onRecover';
+
+    /**
+     * This is called when the user has set the new password for the account
+     *
+     * @event \Tk\EventDispatcher\Event
+     */
+    const RECOVER_PASS = 'auth.onRecoverPass';
 
     /**
      * Called when a new user submits a registration request
