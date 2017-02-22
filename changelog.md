@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.0.7 [2017-02-22]:
+-------------------------------
+ - Added new change password system
+ - Fixed recover password system
+
+
 Ver 2.0.6 [2016-12-30]:
 -------------------------------
  - Minor Code Updates
