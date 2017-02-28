@@ -168,7 +168,8 @@ class Ldap extends Iface
                 throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
             }
         } catch (\Exception $e) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, $e->getMessage());
+            \Tk\Config::getInstance()->getLog()->warning($e->getMessage());
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         $r = new Result(Result::SUCCESS, $username, 'User Found!');
         $r->set('ldap', $data);
