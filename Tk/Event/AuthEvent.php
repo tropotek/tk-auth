@@ -24,6 +24,13 @@ class AuthEvent extends Event
      */
     private $result = null;
 
+    /**
+     * The redirect url for login/logout events
+     *
+     * @var \Tk\Uri
+     */
+    private $redirect = null;
+
 
 
     /**
@@ -47,13 +54,15 @@ class AuthEvent extends Event
     }
 
     /**
-     * Set the result object 
-     * 
+     * Set the result object
+     *
      * @param \Tk\Auth\Result $result
+     * @return $this
      */
     public function setResult($result) 
     {
         $this->result = $result;
+        return $this;
     }
 
     /**
@@ -62,6 +71,26 @@ class AuthEvent extends Event
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * return the url to redirect to after logout.
+     *
+     * @param \Tk\Uri|null $redirect
+     * @return $this
+     */
+    public function setRedirect(\Tk\Uri $redirect = null)
+    {
+        $this->redirect = $redirect;
+        return $this;
+    }
+
+    /**
+     * @return \Tk\Uri
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
     }
     
 }
