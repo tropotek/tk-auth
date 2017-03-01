@@ -159,8 +159,9 @@ class Ldap extends Iface
                 @ldap_start_tls($ldap);
             
             $filter = str_replace('{username}', $username, $this->getFilter());
+
             $b = @ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $password);
-            
+
             if ($b) {
                 $sr = @ldap_search($ldap, $this->getBaseDn(), $filter);
                 $data = @ldap_get_entries($ldap, $sr);
@@ -171,6 +172,7 @@ class Ldap extends Iface
             \Tk\Config::getInstance()->getLog()->warning($e->getMessage());
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
+
         $r = new Result(Result::SUCCESS, $username, 'User Found!');
         $r->set('ldap', $data);
         return $r;
