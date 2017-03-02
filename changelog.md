@@ -1,5 +1,12 @@
 #CHANGELOG#
 
+Ver 2.0.8 [2017-03-02]:
+-------------------------------
+ - Minor Code Updates
+ - 252s-dev.vet.unimelb.edu.au
+ - Finished moveing LDAP to a plugin, wahoo!
+
+
 Ver 2.0.7 [2017-02-22]:
 -------------------------------
  - Added new change password system
