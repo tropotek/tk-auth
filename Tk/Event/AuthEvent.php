@@ -1,7 +1,7 @@
 <?php
 namespace Tk\Event;
 
-use Tk\EventDispatcher\Event;
+use Tk\Event\Event;
 use Tk\Auth;
 
 
