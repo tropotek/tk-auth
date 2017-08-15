@@ -9,15 +9,13 @@ use Tk\Auth\Result;
 
 /**
  * LDAP Authentication adapter
- * 
- *
  *
  * This adapter requires that the data values have been set
+ *
  * ```
  * $adapter->replace(array('username' => $value, 'password' => $password));
  * ```
- * 
- * 
+ *
  */
 class Ldap extends Iface
 {
@@ -159,7 +157,7 @@ class Ldap extends Iface
                 @ldap_start_tls($ldap);
             
             $filter = str_replace('{username}', $username, $this->getFilter());
-
+            vd($filter . ',' . $this->getBaseDn());
             $b = @ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $password);
 
             if ($b) {
