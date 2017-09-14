@@ -155,9 +155,7 @@ class Ldap extends Iface
             $ldap = @ldap_connect($this->getHost(), $this->getPort());
             if ($this->isTls())
                 @ldap_start_tls($ldap);
-            
             $filter = str_replace('{username}', $username, $this->getFilter());
-            vd($filter . ',' . $this->getBaseDn());
             $b = @ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $password);
 
             if ($b) {
