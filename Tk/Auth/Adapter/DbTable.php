@@ -117,8 +117,7 @@ class DbTable extends Iface
         $stmt = $this->db->prepare($sql);
         if (!$stmt->execute()) {
             $errorInfo = $this->db->errorInfo();
-            $e = new \Tk\Db\Exception($errorInfo[2]);
-            $e->setDump('Dump: ' . print_r($this->db->getLastLog(), true));
+            $e = new \Tk\Db\Exception($errorInfo[2], 1000, null, print_r($this->db->getLastLog(), true));
         }
 
         return $stmt->fetchObject();
