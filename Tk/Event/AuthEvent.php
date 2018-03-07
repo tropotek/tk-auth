@@ -41,8 +41,9 @@ class AuthEvent extends Event
      */
     public function __construct($auth, $data = [])
     {
-        parent::__construct($data);
+        //parent::__construct($data);
         $this->auth = $auth;
+        $this->replace($data);
     }
 
     /**
