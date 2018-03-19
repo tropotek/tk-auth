@@ -135,11 +135,10 @@ class Ldap extends Iface
         $this->filter = $filter;
         return $this;
     }
-    
+
     /**
      * Authenticate the user
      *
-     * @throws \Tk\Auth\Exception
      * @return Result
      */
     public function authenticate()

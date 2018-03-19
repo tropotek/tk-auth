@@ -86,6 +86,7 @@ class Auth
      *
      * @param  Auth\Adapter\Iface $adapter
      * @return Auth\Result
+     * @throws Auth\Exception
      */
     public function authenticate(Auth\Adapter\Iface $adapter)
     {

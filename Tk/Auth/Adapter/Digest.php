@@ -69,7 +69,6 @@ class Digest extends Iface
     /**
      * Defined by Tk\Auth\Adapter\Iface
      *
-     * @throws \Tk\Auth\Exception
      * @return \Tk\Auth\Result
      */
     public function authenticate()
