@@ -19,11 +19,11 @@ use Tk\Auth\Result;
  * $adapter->replace(array('username' => $value, 'password' => $password));
  * ```
  * 
- * @link https://en.wikipedia.org/wiki/Digest_access_authentication
+ * @see https://en.wikipedia.org/wiki/Digest_access_authentication
  * @todo This needs to be checked, this code will not work securely.
  *
  * @author Michael Mifsud <info@tropotek.com>
- * @link http://www.tropotek.com/
+ * @see http://www.tropotek.com/
  * @license Copyright 2016 Michael Mifsud
  */
 class Digest extends Iface
