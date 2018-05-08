@@ -144,7 +144,7 @@ class DbTable extends Iface
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {
-            throw new \Tk\Auth\Exception('The supplied parameters failed to produce a valid sql statement, please check table and column names for validity.', 0, $e);
+            \Tk\Log::warning($e->__toString());
         }
         return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $username, 'Invalid username or password.');
     }
