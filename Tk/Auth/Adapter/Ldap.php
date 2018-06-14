@@ -19,31 +19,83 @@ use Tk\Auth\Result;
  */
 class Ldap extends Iface
 {
-
+    /**
+     * @var string
+     */
     protected $host = '';
-    protected $port = 389;
+    /**
+     * @var int
+     */
+    protected $port = 636;
+    /**
+     * @var bool
+     */
     protected $tls = false;
+    /**
+     * @var string
+     */
     protected $baseDn = '';
-    protected $filter = '';
 
 
     /**
      * Constructor
      *
-     * @param string $host
-     * @param string $baseDn
-     * @param string $filter
+     * @param string $host    ldap://centaur.unimelb.edu.au
+     * @param string $baseDn  uid=%s,cn=users,dc=domain,dc=edu
      * @param int $port
      * @param bool $tls
      */
-    public function __construct($host, $baseDn, $filter, $port = 389, $tls = false)
-    {
+    public function __construct($host, $baseDn, $port = 636, $tls = false)    {
         parent::__construct();
         $this->setHost($host);
         $this->setBaseDn($baseDn);
-        $this->setFilter($filter);
         $this->setPort($port);
         $this->setTls($tls);
+    }
+
+    /**
+     * Authenticate the user
+     *
+     * @return Result
+     */
+    public function authenticate()
+    {
+        $username = $this->get('username');
+        $password = $this->get('password');
+        $data = array();
+
+        if (!$username || !$password) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
+        }
+        try {
+            $ldap = @ldap_connect($this->getHost(), $this->getPort());
+            if ($this->isTls())
+                @ldap_start_tls($ldap);
+
+            $baseDn = sprintf(str_replace('{username}', $username, $this->getBaseDn()), $username);
+            $b = @ldap_bind($ldap, $baseDn, $password);
+
+            // TODO: This should be removed from the LDAP authentication and added into the LDAP plugin code as a seperate search query somewhere
+            if ($b) {
+                // TODO: Check this if it errors then the user is not logged in
+                $filter = substr($baseDn, 0, strpos($baseDn, ','));
+                if ($filter) {
+                    $sr = @ldap_search($ldap, $baseDn, $filter);
+                    $data = @ldap_get_entries($ldap, $sr);
+                }
+            } else {
+                throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
+            }
+
+            $r = new Result(Result::SUCCESS, $username, 'User Found!');
+            $r->set('ldap', $data);
+
+            return $r;
+        } catch (\Exception $e) {
+            \Tk\Log::warning($e->getMessage());
+        }
+
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
     }
 
     /**
@@ -116,62 +168,6 @@ class Ldap extends Iface
     {
         $this->baseDn = $baseDn;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilter()
-    {
-        return $this->filter;
-    }
-
-    /**
-     * @param string $filter
-     * @return $this
-     */
-    public function setFilter($filter)
-    {
-        $this->filter = $filter;
-        return $this;
-    }
-
-    /**
-     * Authenticate the user
-     *
-     * @return Result
-     */
-    public function authenticate()
-    {
-        $username = $this->get('username');
-        $password = $this->get('password');
-        $data = array();
-        
-        if (!$username || !$password) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
-        }
-        try {
-            $ldap = @ldap_connect($this->getHost(), $this->getPort());
-            if ($this->isTls())
-                @ldap_start_tls($ldap);
-            $filter = str_replace('{username}', $username, $this->getFilter());
-            $b = @ldap_bind($ldap, $filter . ',' . $this->getBaseDn(), $password);
-
-            if ($b) {
-                $sr = @ldap_search($ldap, $this->getBaseDn(), $filter);
-                $data = @ldap_get_entries($ldap, $sr);
-            } else {
-                throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
-            }
-            $r = new Result(Result::SUCCESS, $username, 'User Found!');
-            $r->set('ldap', $data);
-            return $r;
-
-        } catch (\Exception $e) {
-            \Tk\Log::warning($e->getMessage());
-        }
-
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
     }
 
 }
