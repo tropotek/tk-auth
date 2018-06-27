@@ -61,7 +61,6 @@ class DbTable extends Iface
      */
     public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $activeColumn = '')
     {
-        parent::__construct();
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;

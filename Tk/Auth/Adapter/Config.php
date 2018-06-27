@@ -47,7 +47,6 @@ class Config extends Iface
      */
     public function __construct($requiredUsername, $requiredPassword, $onHash = null)
     {
-        parent::__construct();
         $this->requiredUsername = $requiredUsername;
         $this->requiredPassword = $requiredPassword;
         $this->onHash = $onHash;

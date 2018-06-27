@@ -10,14 +10,13 @@ use Tk\Auth\Result;
  */
 class NullAuth extends Iface
 {
-    use \Tk\CollectionTrait;
 
     /**
      * NullAuth constructor.
      */
     public function __construct()
     {
-        parent::__construct();
+
     }
 
     /**

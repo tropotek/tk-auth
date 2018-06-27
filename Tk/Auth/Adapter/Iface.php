@@ -11,8 +11,9 @@ namespace Tk\Auth\Adapter;
  * 
  *
  */
-abstract class Iface extends \Tk\Collection
+abstract class Iface
 {
+    use \Tk\CollectionTrait;
 
     /**
      * Performs an authentication attempt

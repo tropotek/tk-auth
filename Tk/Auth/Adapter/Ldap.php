@@ -51,8 +51,8 @@ class Ldap extends Iface
      * @param int $port
      * @param bool $tls
      */
-    public function __construct($host, $baseDn, $port = 636, $tls = false)    {
-        parent::__construct();
+    public function __construct($host, $baseDn, $port = 636, $tls = false)
+    {
         $this->setHost($host);
         $this->setBaseDn($baseDn);
         if ($port <= 0) $port = 636;

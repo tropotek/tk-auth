@@ -1,5 +1,6 @@
 <?php
 namespace Tk;
+use Tk\Auth\Result;
 
 /**
  * This Auth object validates a user and manages a user session/cookie/object
@@ -88,13 +89,15 @@ class Auth
      * @return Auth\Result
      * @throws Auth\Exception
      */
-    public function authenticate(Auth\Adapter\Iface $adapter)
+    public function authenticate($adapter)
     {
-        // Clear storage
         if ($this->hasIdentity()) {
             $this->clearIdentity();
         }
-        $loginResult = $adapter->authenticate();
+        $loginResult = new Result(Result::FAILURE_UNKNOWN, '', 'Login Error: Contact Administrator.');
+        if ($adapter) {
+            $loginResult = $adapter->authenticate();
+        }
         if ($loginResult && $loginResult->isValid()) {
             $this->getStorage()->write($loginResult->getIdentity());
         }

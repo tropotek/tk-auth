@@ -46,8 +46,6 @@ class Digest extends Iface
 
 
     /**
-     * Constructor
-     *
      * @param string $file
      * @param string $realm
      * @param $scheme
@@ -55,7 +53,6 @@ class Digest extends Iface
      */
     public function __construct($file, $realm, $scheme)
     {
-        parent::__construct();
         $this->file = $file;
         $this->scheme = $scheme;
         $this->realm = $realm;

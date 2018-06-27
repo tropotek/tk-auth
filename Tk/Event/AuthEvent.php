@@ -1,8 +1,6 @@
 <?php
 namespace Tk\Event;
 
-use Tk\Event\Event;
-
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -13,13 +11,17 @@ class AuthEvent extends Event
 {
 
     /**
+     * @var \Tk\Auth\Adapter\Iface
+     */
+    private $adapter = null;
+
+    /**
      * @var \Tk\Auth\Result
      */
     private $result = null;
 
     /**
      * The redirect url for login/logout events
-     *
      * @var \Tk\Uri
      */
     private $redirect = null;
@@ -63,6 +65,24 @@ class AuthEvent extends Event
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return \Tk\Auth\Adapter\Iface
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
+
+    /**
+     * @param \Tk\Auth\Adapter\Iface $adapter
+     * @return $this
+     */
+    public function setAdapter($adapter)
+    {
+        $this->adapter = $adapter;
+        return $this;
     }
 
     /**

@@ -29,7 +29,6 @@ class Trapdoor extends Iface
      */
     public function __construct($masterKey = '')
     {
-        parent::__construct();
         // Generate the default masterkey
         if (!$masterKey) {
             $tz = date_default_timezone_get();
