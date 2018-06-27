@@ -70,6 +70,7 @@ class Digest extends Iface
      * Defined by Tk\Auth\Adapter\Iface
      *
      * @return \Tk\Auth\Result
+     * @throws \Tk\Exception
      */
     public function authenticate()
     {
@@ -83,8 +84,17 @@ class Digest extends Iface
         $idLength = strlen($id);
         while ($line = trim(fgets($fileHandle))) {
             if (substr($line, 0, $idLength) === $id) {
-                if ( $this->_secureStringCompare(substr($line, -32), hash('md5', sprintf('%s:%s:%s', $username, $this->realm, $password))) ) { 
-                    return new Result(Result::SUCCESS, $username);
+                if ( $this->_secureStringCompare(substr($line, -32), hash('md5', sprintf('%s:%s:%s', $username, $this->realm, $password))) ) {
+                    /** @var \Tk\Event\Dispatcher $dispatcher */
+                    $dispatcher = $this->getConfig()->getEventDispatcher();
+                    if ($dispatcher) {
+                        $event = new \Tk\Event\AuthAdapterEvent($this);
+                        $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
+                        if ($event->getResult()) {
+                            return $event->getResult();
+                        }
+                    }
+                    return new Result(Result::SUCCESS, $username, 'User Found!');
                 } else {
                     return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Username or Password incorrect');
                 }

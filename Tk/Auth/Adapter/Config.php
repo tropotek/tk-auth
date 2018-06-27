@@ -22,15 +22,20 @@ use Tk\Auth\Result;
  */
 class Config extends Iface
 {
-
+    /**
+     * @var string
+     */
     protected $requiredUsername = '';
 
+    /**
+     * @var string
+     */
     protected $requiredPassword = '';
 
     /**
      * @var callable
      */
-    protected $hashCallback = null;
+    protected $onHash = null;
 
 
     /**
@@ -38,24 +43,25 @@ class Config extends Iface
      *
      * @param string $requiredUsername The username to validate against
      * @param string $requiredPassword The password to validate against
+     * @param null|callable $onHash
      */
-    public function __construct($requiredUsername, $requiredPassword)
+    public function __construct($requiredUsername, $requiredPassword, $onHash = null)
     {
         parent::__construct();
         $this->requiredUsername = $requiredUsername;
         $this->requiredPassword = $requiredPassword;
+        $this->onHash = $onHash;
     }
 
     /**
-     * If a hash function is set then that is used to has a password.
-     * The password and the user stdClass is sent to the function for hashing.
+     * If a hash function is set then that is used to hash a password.
      *
      * @param $callable
      * @return $this
      */
-    public function setHashCallback($callable)
+    public function setOnHash($callable)
     {
-        $this->hashCallback = $callable;
+        $this->onHash = $callable;
         return $this;
     }
 
@@ -68,16 +74,16 @@ class Config extends Iface
      */
     public function hashPassword($password, $user = null)
     {
-        if ($this->hashCallback) {
-            return call_user_func_array($this->hashCallback, array($password, $user));
+        if ($this->onHash) {
+            return call_user_func_array($this->onHash, array($password, $user));
         }
         return $password;
     }
-    
-    
+
+
     /**
-     *
      * @return Result
+     * @throws \Tk\Exception
      */
     public function authenticate()
     {
@@ -86,7 +92,16 @@ class Config extends Iface
         
         if ($this->requiredUsername && $this->requiredPassword) {
             if ($username == $this->requiredUsername && $this->hashPassword($password) == $this->requiredPassword) {
-                return new Result(Result::SUCCESS, $username);
+                /** @var \Tk\Event\Dispatcher $dispatcher */
+                $dispatcher = $this->getConfig()->getEventDispatcher();
+                if ($dispatcher) {
+                    $event = new \Tk\Event\AuthAdapterEvent($this);
+                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
+                    if ($event->getResult()) {
+                        return $event->getResult();
+                    }
+                }
+                return new Result(Result::SUCCESS, $username, 'User Found!');
             }
         }
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');

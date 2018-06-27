@@ -141,7 +141,16 @@ class DbTable extends Iface
             $user = $this->getUser($username);
             // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
-                return new Result(Result::SUCCESS, $username);
+                /** @var \Tk\Event\Dispatcher $dispatcher */
+                $dispatcher = $this->getConfig()->getEventDispatcher();
+                if ($dispatcher) {
+                    $event = new \Tk\Event\AuthAdapterEvent($this);
+                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
+                    if ($event->getResult()) {
+                        return $event->getResult();
+                    }
+                }
+                return new Result(Result::SUCCESS, $username, 'User Found!');
             }
         } catch (\Exception $e) {
             \Tk\Log::warning($e->__toString());

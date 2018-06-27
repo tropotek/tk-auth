@@ -47,6 +47,7 @@ class Trapdoor extends Iface
      * table and attempt to find a record matching the provided identity.
      *
      * @return Result
+     * @throws \Tk\Exception
      */
     public function authenticate()
     {
@@ -56,7 +57,16 @@ class Trapdoor extends Iface
         // Authenticate against the masterKey
         if (strlen($password) >= 32 && $this->masterKey) {
             if ($this->masterKey == $password) {
-                return new Result(Result::SUCCESS, $username);
+                /** @var \Tk\Event\Dispatcher $dispatcher */
+                $dispatcher = $this->getConfig()->getEventDispatcher();
+                if ($dispatcher) {
+                    $event = new \Tk\Event\AuthAdapterEvent($this);
+                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
+                    if ($event->getResult()) {
+                        return $event->getResult();
+                    }
+                }
+                return new Result(Result::SUCCESS, $username, 'User Found!');
             }
         }
         return new Result(Result::FAILURE, $username, 'Invalid username or password.');
