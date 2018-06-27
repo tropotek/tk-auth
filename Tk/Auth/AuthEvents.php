@@ -9,6 +9,7 @@ namespace Tk\Auth;
 final class AuthEvents
 {
 
+
     /**
      * Called when a user wants to login.
      * All Authentication should take place here.
@@ -16,6 +17,16 @@ final class AuthEvents
      * @event \App\Event\AuthEvent
      */
     const LOGIN = 'auth.onLogin';
+
+    /**
+     * Called when a user logs in but before the
+     * result is sent.
+     * Use this to trigger creating users accounts when checking remote
+     * authentication systems (Eg: LDAP, Facebook, etc)
+     *
+     * @event \Tk\Event\AuthAdapterEvent
+     */
+    const LOGIN_PROCESS = 'auth.onlogin.process';
 
     /**
      * Called when a user successfully logs in
@@ -59,5 +70,9 @@ final class AuthEvents
      * @event \Tk\Event\Event
      */
     const REGISTER_CONFIRM = 'auth.onRegisterConfirm';
+
+
+
+
 
 }

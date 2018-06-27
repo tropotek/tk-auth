@@ -19,6 +19,7 @@ use Tk\Auth\Result;
  */
 class Ldap extends Iface
 {
+
     /**
      * @var string
      */
@@ -36,6 +37,11 @@ class Ldap extends Iface
      */
     protected $baseDn = '';
 
+    /**
+     * @var null|resource
+     */
+    protected $ldap = null;
+
 
     /**
      * Constructor
@@ -49,6 +55,7 @@ class Ldap extends Iface
         parent::__construct();
         $this->setHost($host);
         $this->setBaseDn($baseDn);
+        if ($port <= 0) $port = 636;
         $this->setPort($port);
         $this->setTls($tls);
     }
@@ -62,40 +69,44 @@ class Ldap extends Iface
     {
         $username = $this->get('username');
         $password = $this->get('password');
-        $data = array();
 
         if (!$username || !$password) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         try {
-            $ldap = @ldap_connect($this->getHost(), $this->getPort());
+            $this->ldap = @ldap_connect($this->getHost(), $this->getPort());
             if ($this->isTls())
-                @ldap_start_tls($ldap);
+                @ldap_start_tls($this->getLdap());
 
-            $baseDn = sprintf(str_replace('{username}', $username, $this->getBaseDn()), $username);
-            $b = @ldap_bind($ldap, $baseDn, $password);
+            $this->setBaseDn(sprintf($this->getBaseDn(), $username));
+            // legacy check (remove in future versions)
+            $this->setBaseDn(str_replace('{username}', $username, $this->getBaseDn()));
 
-            // TODO: This should be removed from the LDAP authentication and added into the LDAP plugin code as a seperate search query somewhere
-            if ($b) {
-                // TODO: Check this if it errors then the user is not logged in
-                $filter = substr($baseDn, 0, strpos($baseDn, ','));
-                if ($filter) {
-                    $sr = @ldap_search($ldap, $baseDn, $filter);
-                    $data = @ldap_get_entries($ldap, $sr);
+            if (@ldap_bind($this->getLdap(), $this->getBaseDn(), $password)) {
+                /** @var \Tk\Event\Dispatcher $dispatcher */
+                $dispatcher = $this->getConfig()->getEventDispatcher();
+                if ($dispatcher) {
+                    $event = new \Tk\Event\AuthAdapterEvent($this);
+                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
+                    if ($event->getResult()) {
+                        return $event->getResult();
+                    }
                 }
-            } else {
-                throw new \Tk\Auth\Exception('1000: Failed to authenticate user');
+                return new Result(Result::SUCCESS, $username, 'User Found!');
             }
-
-            $r = new Result(Result::SUCCESS, $username, 'User Found!');
-            $r->set('ldap', $data);
-
-            return $r;
         } catch (\Exception $e) {
             \Tk\Log::warning($e->getMessage());
         }
 
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
+    }
+
+    /**
+     * @return null|resource
+     */
+    public function getLdap()
+    {
+        return $this->ldap;
     }
 
     /**

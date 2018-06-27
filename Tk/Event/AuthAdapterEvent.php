@@ -1,7 +1,6 @@
 <?php
 namespace Tk\Event;
 
-use Tk\Event\Event;
 
 
 /**
@@ -9,30 +8,29 @@ use Tk\Event\Event;
  * @see http://www.tropotek.com/
  * @license Copyright 2016 Michael Mifsud
  */
-class AuthEvent extends Event
+class AuthAdapterEvent extends Event
 {
 
     /**
-     * @var \Tk\Auth\Result
+     * @var \Tk\Auth\Result|null
      */
     private $result = null;
 
     /**
-     * The redirect url for login/logout events
-     *
-     * @var \Tk\Uri
+     * @var \Tk\Auth\Adapter\Iface
      */
-    private $redirect = null;
-
+    private $adapter = null;
 
 
     /**
      * __construct
      *
-     * @param array $data  Login data from a login interface (ie: form, openId, etc)
+     * @param \Tk\Auth\Adapter\Iface $adapter
+     * @param array $data Login data from a login interface (ie: form, openId, etc)
      */
-    public function __construct($data = [])
+    public function __construct($adapter, $data = [])
     {
+        $this->adapter = $adapter;
         $this->replace($data);
     }
 
@@ -58,7 +56,7 @@ class AuthEvent extends Event
     }
 
     /**
-     * @return \Tk\Auth\Result
+     * @return \Tk\Auth\Result|null
      */
     public function getResult()
     {
@@ -66,23 +64,11 @@ class AuthEvent extends Event
     }
 
     /**
-     * return the url to redirect to after logout.
-     *
-     * @param \Tk\Uri|null $redirect
-     * @return $this
+     * @return \Tk\Auth\Adapter\Iface
      */
-    public function setRedirect(\Tk\Uri $redirect = null)
+    public function getAdapter()
     {
-        $this->redirect = $redirect;
-        return $this;
-    }
-
-    /**
-     * @return \Tk\Uri
-     */
-    public function getRedirect()
-    {
-        return $this->redirect;
+        return $this->adapter;
     }
     
 }

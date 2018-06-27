@@ -23,4 +23,12 @@ abstract class Iface extends \Tk\Collection
     public abstract function authenticate();
 
 
+    /**
+     * @return \Tk\Config
+     */
+    public function getConfig()
+    {
+        return \Tk\Config::getInstance();
+    }
+
 }
