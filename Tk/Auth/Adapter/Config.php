@@ -101,7 +101,7 @@ class Config extends Iface
                         return $event->getResult();
                     }
                 }
-                return new Result(Result::SUCCESS, $username, 'User Found!');
+                return new Result(Result::SUCCESS, $username);
             }
         }
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');

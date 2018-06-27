@@ -27,13 +27,10 @@ class NullAuth extends Iface
     public function authenticate()
     {
         $username = $this->get('username');
-        $password = $this->get('password');
-
-        if (!$username || !$password) {
+        if (!$username) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         try {
-
             /** @var \Tk\Event\Dispatcher $dispatcher */
             $dispatcher = $this->getConfig()->getEventDispatcher();
             if ($dispatcher) {
@@ -43,15 +40,10 @@ class NullAuth extends Iface
                     return $event->getResult();
                 }
             }
-            return new Result(Result::SUCCESS, $username, 'User Found!');
-
+            return new Result(Result::SUCCESS, $username);
         } catch (\Exception $e) {
             \Tk\Log::warning($e->getMessage());
         }
-
-
-
-
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, '', 'Invalid credentials.');
     }
  

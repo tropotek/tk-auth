@@ -19,8 +19,7 @@ final class AuthEvents
     const LOGIN = 'auth.onLogin';
 
     /**
-     * Called when a user logs in but before the
-     * result is sent.
+     * Called when a user logs in successfully but before the result is sent.
      * Use this to trigger creating users accounts when checking remote
      * authentication systems (Eg: LDAP, Facebook, etc)
      *

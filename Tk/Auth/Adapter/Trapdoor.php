@@ -66,7 +66,7 @@ class Trapdoor extends Iface
                         return $event->getResult();
                     }
                 }
-                return new Result(Result::SUCCESS, $username, 'User Found!');
+                return new Result(Result::SUCCESS, $username);
             }
         }
         return new Result(Result::FAILURE, $username, 'Invalid username or password.');

@@ -150,7 +150,7 @@ class DbTable extends Iface
                         return $event->getResult();
                     }
                 }
-                return new Result(Result::SUCCESS, $username, 'User Found!');
+                return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {
             \Tk\Log::warning($e->__toString());

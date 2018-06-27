@@ -94,7 +94,7 @@ class Digest extends Iface
                             return $event->getResult();
                         }
                     }
-                    return new Result(Result::SUCCESS, $username, 'User Found!');
+                    return new Result(Result::SUCCESS, $username);
                 } else {
                     return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Username or Password incorrect');
                 }

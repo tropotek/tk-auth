@@ -8,8 +8,9 @@ namespace Tk\Auth;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Result extends \Tk\Collection
+class Result
 {
+    use \Tk\CollectionTrait;
     
     /**
      * General Failure
@@ -67,7 +68,6 @@ class Result extends \Tk\Collection
 
 
 
-
     /**
      * Sets the result code, identity, and failure messages
      *
@@ -121,9 +121,6 @@ class Result extends \Tk\Collection
      */
     public function getMessages()
     {
-        if (!is_array($this->messages)) {
-            $this->messages = array('messages' => $this->messages);
-        }
         return $this->messages;
     }
 }
