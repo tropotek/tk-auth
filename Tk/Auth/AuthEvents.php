@@ -23,7 +23,7 @@ final class AuthEvents
      * Use this to trigger creating users accounts when checking remote
      * authentication systems (Eg: LDAP, Facebook, etc)
      *
-     * @event \Tk\Event\AuthAdapterEvent
+     * @event \Tk\Event\AuthEvent
      */
     const LOGIN_PROCESS = 'auth.onlogin.process';
 
