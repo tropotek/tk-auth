@@ -31,11 +31,11 @@ class AuthEvent extends Event
     /**
      * __construct
      *
-     * @param array $data  Login data from a login interface (ie: form, openId, etc)
+     * @param \Tk\Auth\Adapter\Iface $adapter
      */
-    public function __construct($data = [])
+    public function __construct($adapter = null)
     {
-        $this->replace($data);
+        $this->adapter = $adapter;
     }
 
     /**
