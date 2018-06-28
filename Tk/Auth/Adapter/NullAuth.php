@@ -33,7 +33,7 @@ class NullAuth extends Iface
             /** @var \Tk\Event\Dispatcher $dispatcher */
             $dispatcher = $this->getConfig()->getEventDispatcher();
             if ($dispatcher) {
-                $event = new \Tk\Event\AuthAdapterEvent($this);
+                $event = new \Tk\Event\AuthEvent($this);
                 $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
                 if ($event->getResult()) {
                     return $event->getResult();
