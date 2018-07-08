@@ -139,8 +139,6 @@ class DbTable extends Iface
         try {
             $user = $this->getUser($username);
             // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
-            vd($user->{$this->passwordColumn}, $this->hashPassword($password, $user));
-
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
                 /** @var \Tk\Event\Dispatcher $dispatcher */
                 $dispatcher = $this->getConfig()->getEventDispatcher();
