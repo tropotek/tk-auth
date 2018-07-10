@@ -60,6 +60,7 @@ class Ldap extends Iface
         $this->setTls($tls);
     }
 
+
     /**
      * Authenticate the user
      *
@@ -71,7 +72,7 @@ class Ldap extends Iface
         $password = $this->get('password');
 
         if (!$username || !$password) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, '0000 Invalid username or password.');
         }
         try {
             $this->ldap = @ldap_connect($this->getHost(), $this->getPort());
@@ -98,8 +99,24 @@ class Ldap extends Iface
             \Tk\Log::warning($e->getMessage());
         }
 
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, '0001 Invalid username or password.');
     }
+
+    /**
+     * @param $baseDn
+     * @param $filter
+     * @return resource|false|null
+     */
+    public function ldapSearch($filter)
+    {
+        $ldapData = null;
+        if ($this->ldap) {
+            $sr = @ldap_search($this->getLdap(), $this->getBaseDn(), $filter);
+            $ldapData = @ldap_get_entries($this->getLdap(), $sr);
+        }
+        return $ldapData;
+    }
+
 
     /**
      * @return null|resource
