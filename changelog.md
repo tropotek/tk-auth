@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.0.20 [2018-07-11]:
+-------------------------------
+Finally found the issue with the LDAP adapter and login
+Minor Code Updates
+
+
 Ver 2.0.18 [2018-06-29]:
 -------------------------------
 Minor Code Updates
