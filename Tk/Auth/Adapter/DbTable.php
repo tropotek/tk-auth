@@ -36,6 +36,7 @@ class DbTable extends Iface
 
     /**
      * @var string
+     * @deprecated
      */
     protected $activeColumn = '';
 
@@ -57,15 +58,13 @@ class DbTable extends Iface
      * @param string $tableName
      * @param string $userColumn
      * @param string $passColumn
-     * @param string $activeColumn
      */
-    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn, $activeColumn = '')
+    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn)
     {
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
         $this->passwordColumn = $passColumn;
-        $this->activeColumn = $activeColumn;
     }
 
     /**
@@ -102,17 +101,12 @@ class DbTable extends Iface
      */
     protected function getUser($username)
     {
-        $active = '';
-        if ($this->activeColumn) {
-            $active = 'AND '.$this->db->quoteParameter($this->activeColumn).' = 1';
-        }
-        $sql = sprintf('SELECT * FROM %s WHERE %s = %s %s LIMIT 1',
+        $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
             $this->db->quoteParameter($this->tableName),
             $this->db->quoteParameter($this->usernameColumn),
-            $this->db->quote($username),
-            $active
+            $this->db->quote($username)
         );
-
+vd($sql);
         $stmt = $this->db->prepare($sql);
         if (!$stmt->execute()) {
             $errorInfo = $this->db->errorInfo();
