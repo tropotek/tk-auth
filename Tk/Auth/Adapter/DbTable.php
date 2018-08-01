@@ -35,12 +35,6 @@ class DbTable extends Iface
     protected $passwordColumn = '';
 
     /**
-     * @var string
-     * @deprecated
-     */
-    protected $activeColumn = '';
-
-    /**
      * @var \Tk\Db\Pdo
      */
     protected $db = null;
@@ -106,7 +100,7 @@ class DbTable extends Iface
             $this->db->quoteParameter($this->usernameColumn),
             $this->db->quote($username)
         );
-vd($sql);
+
         $stmt = $this->db->prepare($sql);
         if (!$stmt->execute()) {
             $errorInfo = $this->db->errorInfo();
