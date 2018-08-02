@@ -105,6 +105,7 @@ class DbTable extends Iface
         if (!$stmt->execute()) {
             $errorInfo = $this->db->errorInfo();
             $e = new \Tk\Db\Exception($errorInfo[2], 1000, null, print_r($this->db->getLastLog(), true));
+            \Tk\Log::error($e->__toString());
         }
 
         return $stmt->fetchObject();
