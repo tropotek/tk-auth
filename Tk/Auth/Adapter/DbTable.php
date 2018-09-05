@@ -55,6 +55,7 @@ class DbTable extends Iface
      */
     public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn)
     {
+        parent::__construct();
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
@@ -92,6 +93,7 @@ class DbTable extends Iface
     /**
      * @param $username
      * @return \stdClass
+     * @throws \Tk\Db\Exception
      */
     protected function getUser($username)
     {
@@ -112,7 +114,6 @@ class DbTable extends Iface
     }
 
     /**
-     *
      * @return Result
      * @throws \Tk\Auth\Exception if answering the authentication query is impossible
      */
@@ -129,14 +130,9 @@ class DbTable extends Iface
             $user = $this->getUser($username);
             // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
-                /** @var \Tk\Event\Dispatcher $dispatcher */
-                $dispatcher = $this->getConfig()->getEventDispatcher();
-                if ($dispatcher) {
-                    $event = new \Tk\Event\AuthEvent($this);
-                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                    if ($event->getResult()) {
-                        return $event->getResult();
-                    }
+                $this->dispatchLoginProcess();
+                if ($this->getLoginProcessEvent()->getResult()) {
+                    return $this->getLoginProcessEvent()->getResult();
                 }
                 return new Result(Result::SUCCESS, $username);
             }

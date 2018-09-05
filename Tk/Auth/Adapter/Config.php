@@ -47,6 +47,7 @@ class Config extends Iface
      */
     public function __construct($requiredUsername, $requiredPassword, $onHash = null)
     {
+        parent::__construct();
         $this->requiredUsername = $requiredUsername;
         $this->requiredPassword = $requiredPassword;
         $this->onHash = $onHash;
@@ -91,14 +92,9 @@ class Config extends Iface
         
         if ($this->requiredUsername && $this->requiredPassword) {
             if ($username == $this->requiredUsername && $this->hashPassword($password) == $this->requiredPassword) {
-                /** @var \Tk\Event\Dispatcher $dispatcher */
-                $dispatcher = $this->getConfig()->getEventDispatcher();
-                if ($dispatcher) {
-                    $event = new \Tk\Event\AuthEvent($this);
-                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                    if ($event->getResult()) {
-                        return $event->getResult();
-                    }
+                $this->dispatchLoginProcess();
+                if ($this->getLoginProcessEvent()->getResult()) {
+                    return $this->getLoginProcessEvent()->getResult();
                 }
                 return new Result(Result::SUCCESS, $username);
             }

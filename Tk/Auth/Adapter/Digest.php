@@ -53,6 +53,7 @@ class Digest extends Iface
      */
     public function __construct($file, $realm, $scheme)
     {
+        parent::__construct();
         $this->file = $file;
         $this->scheme = $scheme;
         $this->realm = $realm;
@@ -82,14 +83,9 @@ class Digest extends Iface
         while ($line = trim(fgets($fileHandle))) {
             if (substr($line, 0, $idLength) === $id) {
                 if ( $this->_secureStringCompare(substr($line, -32), hash('md5', sprintf('%s:%s:%s', $username, $this->realm, $password))) ) {
-                    /** @var \Tk\Event\Dispatcher $dispatcher */
-                    $dispatcher = $this->getConfig()->getEventDispatcher();
-                    if ($dispatcher) {
-                        $event = new \Tk\Event\AuthEvent($this);
-                        $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                        if ($event->getResult()) {
-                            return $event->getResult();
-                        }
+                    $this->dispatchLoginProcess();
+                    if ($this->getLoginProcessEvent()->getResult()) {
+                        return $this->getLoginProcessEvent()->getResult();
                     }
                     return new Result(Result::SUCCESS, $username);
                 } else {

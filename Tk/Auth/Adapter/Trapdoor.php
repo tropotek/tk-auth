@@ -29,6 +29,7 @@ class Trapdoor extends Iface
      */
     public function __construct($masterKey = '')
     {
+        parent::__construct();
         // Generate the default masterkey
         if (!$masterKey) {
             $tz = date_default_timezone_get();
@@ -56,14 +57,9 @@ class Trapdoor extends Iface
         // Authenticate against the masterKey
         if (strlen($password) >= 32 && $this->masterKey) {
             if ($this->masterKey == $password) {
-                /** @var \Tk\Event\Dispatcher $dispatcher */
-                $dispatcher = $this->getConfig()->getEventDispatcher();
-                if ($dispatcher) {
-                    $event = new \Tk\Event\AuthEvent($this);
-                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                    if ($event->getResult()) {
-                        return $event->getResult();
-                    }
+                $this->dispatchLoginProcess();
+                if ($this->getLoginProcessEvent()->getResult()) {
+                    return $this->getLoginProcessEvent()->getResult();
                 }
                 return new Result(Result::SUCCESS, $username);
             }

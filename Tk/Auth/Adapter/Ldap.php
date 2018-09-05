@@ -53,6 +53,7 @@ class Ldap extends Iface
      */
     public function __construct($host, $baseDn, $port = 636, $tls = false)
     {
+        parent::__construct();
         $this->setHost($host);
         $this->setBaseDn($baseDn);
         if ($port <= 0) $port = 636;
@@ -84,14 +85,9 @@ class Ldap extends Iface
             $this->setBaseDn(str_replace('{username}', $username, $this->getBaseDn()));
 
             if (@ldap_bind($this->getLdap(), $this->getBaseDn(), $password)) {
-                /** @var \Tk\Event\Dispatcher $dispatcher */
-                $dispatcher = $this->getConfig()->getEventDispatcher();
-                if ($dispatcher) {
-                    $event = new \Tk\Event\AuthEvent($this);
-                    $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                    if ($event->getResult()) {
-                        return $event->getResult();
-                    }
+                $this->dispatchLoginProcess();
+                if ($this->getLoginProcessEvent()->getResult()) {
+                    return $this->getLoginProcessEvent()->getResult();
                 }
                 return new Result(Result::SUCCESS, $username);
             }

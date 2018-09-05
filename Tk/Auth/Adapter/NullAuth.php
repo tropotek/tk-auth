@@ -16,6 +16,7 @@ class NullAuth extends Iface
      */
     public function __construct()
     {
+        parent::__construct();
 
     }
 
@@ -30,14 +31,9 @@ class NullAuth extends Iface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         try {
-            /** @var \Tk\Event\Dispatcher $dispatcher */
-            $dispatcher = $this->getConfig()->getEventDispatcher();
-            if ($dispatcher) {
-                $event = new \Tk\Event\AuthEvent($this);
-                $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $event);
-                if ($event->getResult()) {
-                    return $event->getResult();
-                }
+            $this->dispatchLoginProcess();
+            if ($this->getLoginProcessEvent()->getResult()) {
+                return $this->getLoginProcessEvent()->getResult();
             }
             return new Result(Result::SUCCESS, $username);
         } catch (\Exception $e) {
