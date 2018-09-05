@@ -82,7 +82,7 @@ class Config extends Iface
 
     /**
      * @return Result
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function authenticate()
     {
