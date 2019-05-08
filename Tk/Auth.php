@@ -1,6 +1,7 @@
 <?php
 namespace Tk;
 
+// Test Comment
 
 use Tk\Auth\Result;
 
@@ -27,7 +28,7 @@ class Auth
      */
     public $loginResult = null;
 
-  
+
 
     /**
      *
