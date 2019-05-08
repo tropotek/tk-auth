@@ -27,7 +27,7 @@ class Auth
      */
     public $loginResult = null;
 
-
+  
 
     /**
      *
