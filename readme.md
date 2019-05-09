@@ -1,7 +1,6 @@
 # Tk Auth :boom: 
 
-__Project:__ [ttek/tk-auth](http://packagist.org/packages/ttek/tk-auth)  
-__Published:__ 01 Dec 2015
+__Project:__ [ttek/tk-auth](http://packagist.org/packages/ttek/tk-auth)
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
@@ -25,7 +24,7 @@ composer require ttek/tk-auth
 Or add the following to your composer.json file:
 
 ```json
-"ttek/tk-auth": "~2.0"
+"ttek/tk-auth": "~3.0"
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any
