@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.0.26 [2019-05-12]:
+-------------------------------
+  - Merge branch 'master' of https://github.com/tropotek/tk-auth
+  - Preparing branch master for new release
+
+
 Ver 2.0.26 [2018-09-11]:
 -------------------------------
   - Still updating new-template branch
