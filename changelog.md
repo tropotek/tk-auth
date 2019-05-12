@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.0 [2019-05-12]:
+-------------------------------
+  - Merge pull request #1 from tropotek/3beta
+
+
 Ver 2.0.26 [2018-09-11]:
 -------------------------------
   - Still updating new-template branch
