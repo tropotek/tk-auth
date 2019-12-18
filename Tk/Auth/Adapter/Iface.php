@@ -6,14 +6,16 @@
  */
 namespace Tk\Auth\Adapter;
 
+use Tk\ConfigTrait;
+use Tk\CollectionTrait;
+
 /**
  * Adapter Interface
- * 
- *
  */
 abstract class Iface
 {
-    use \Tk\CollectionTrait;
+    use CollectionTrait;
+    use ConfigTrait;
 
     /**
      * @var \Tk\Event\AuthEvent
@@ -63,12 +65,5 @@ abstract class Iface
         return $this->event;
     }
 
-    /**
-     * @return \Tk\Config
-     */
-    public function getConfig()
-    {
-        return \Tk\Config::getInstance();
-    }
 
 }
