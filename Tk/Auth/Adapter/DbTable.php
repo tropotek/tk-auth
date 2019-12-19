@@ -95,7 +95,7 @@ class DbTable extends Iface
      * @return \stdClass
      * @throws \Tk\Db\Exception
      */
-    protected function getUser($username)
+    protected function getUserRow($username)
     {
         $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
             $this->db->quoteParameter($this->tableName),
@@ -127,7 +127,7 @@ class DbTable extends Iface
         }
 
         try {
-            $user = $this->getUser($username);
+            $user = $this->getUserRow($username);
             // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
                 $this->dispatchLoginProcess();
