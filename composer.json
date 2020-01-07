@@ -2,13 +2,10 @@
     "name": "ttek/tk-auth",
     "type": "library",
     "description": "A base lib for authentication in websites",
-    "keywords":  [
-        "tropotek",
-        "Auth"
-    ],
-    "time": "2020-01-07",
+    "keywords":  ["tropotek", "Auth" ],
+    "time": "2019-04-09",
     "license": "MIT",
-    "version": "3.0.8",
+    "version": "3.0.0",
     "authors":  [
          {
             "name": "Michael Mifsud",
