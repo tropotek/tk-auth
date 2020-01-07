@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.8 [2020-01-07]:
+-------------------------------
+  - Added CA buttons to student placement list as requested.
+
+
 Ver 3.0.6 [2019-08-09]:
 -------------------------------
 
