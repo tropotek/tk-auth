@@ -101,7 +101,7 @@ class Ldap extends Iface
     /**
      * @param $baseDn
      * @param $filter
-     * @return resource|false|null
+     * @return array|resource|false|null
      */
     public function ldapSearch($filter)
     {
