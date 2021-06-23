@@ -19,14 +19,6 @@
     {
       "type": "Paypal",
       "url": "https://www.paypal.me/tropotek"
-    },
-    {
-      "type": "Bitcoin",
-      "url": "bc1qk4madjn7sdngxcmk9xldm8kxw4te9ryn6l9kfh"
-    },
-    {
-      "type": "ETH",
-      "url": "0x7395E7f0aaee38FE650Bb056215D403b9BAE1436"
     }
   ],
   "autoload": {
