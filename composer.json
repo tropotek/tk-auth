@@ -1,5 +1,5 @@
 {
-  "name": "ttek/tk-auth",
+  "name": "uom/tk-auth",
   "type": "library",
   "description": "A base lib for authentication in websites",
   "keywords": [
@@ -11,14 +11,7 @@
   "authors": [
     {
       "name": "Michael Mifsud",
-      "email": "info@tropotek.com.au",
       "homepage": "http://www.tropotek.com/"
-    }
-  ],
-  "funding": [
-    {
-      "type": "Paypal",
-      "url": "https://www.paypal.me/tropotek"
     }
   ],
   "autoload": {
@@ -27,7 +20,7 @@
     }
   },
   "require": {
-    "ttek/tk-framework": "~3.0.0"
+    "uom/tk-framework": "~3.0.0"
   },
   "extra": {
     "branch-alias": {
