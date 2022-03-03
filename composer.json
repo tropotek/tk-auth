@@ -20,11 +20,10 @@
     }
   },
   "require": {
-    "uom/tk-framework": "~3.0.0"
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "3.0.x-dev"
+      "dev-master": "3.2.x-dev"
     }
   }
 }

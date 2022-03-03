@@ -24,7 +24,7 @@ composer require uom/tk-auth
 Or add the following to your composer.json file:
 
 ```json
-"uom/tk-auth": "~3.0"
+"uom/tk-auth": "~3.2"
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any
