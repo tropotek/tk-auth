@@ -1,6 +1,6 @@
 # Tk Auth :boom: 
 
-__Project:__ [uom/tk-auth](http://packagist.org/packages/uom/tk-auth)
+__Project:__ [ttek/tk-auth](http://packagist.org/packages/ttek/tk-auth)
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
@@ -14,17 +14,17 @@ This is the lib for the Tk Framework HTML Authentication system
 
 ## Installation
 
-Available on Packagist ([uom/tk-form](http://packagist.org/packages/uom/tk-auth))
+Available on Packagist ([ttek/tk-form](http://packagist.org/packages/ttek/tk-auth))
 and as such installable via [Composer](http://getcomposer.org/).
 
 ```bash
-composer require uom/tk-auth
+composer require ttek/tk-auth
 ```
 
 Or add the following to your composer.json file:
 
 ```json
-"uom/tk-auth": "~3.2"
+"ttek/tk-auth": "~3.2"
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any

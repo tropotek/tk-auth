@@ -1,5 +1,5 @@
 {
-  "name": "uom/tk-auth",
+  "name": "ttek/tk-auth",
   "type": "library",
   "description": "A base lib for authentication in websites",
   "keywords": [
