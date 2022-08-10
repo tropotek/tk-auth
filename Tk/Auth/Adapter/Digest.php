@@ -22,7 +22,7 @@ use Tk\Auth\Result;
  * @see https://en.wikipedia.org/wiki/Digest_access_authentication
  * @todo This needs to be checked, this code will not work securely.
  *
- * @author Michael Mifsud <info@tropotek.com>
+ * @author Michael Mifsud <http://www.tropotek.com/>
  * @see http://www.tropotek.com/
  * @license Copyright 2016 Michael Mifsud
  */

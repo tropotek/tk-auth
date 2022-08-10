@@ -8,7 +8,7 @@ use Tk\Auth\Result;
  * This Auth object validates a user and manages a user session/cookie/object
  *
  *
- * @author Michael Mifsud <info@tropotek.com>
+ * @author Michael Mifsud <http://www.tropotek.com/>
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
