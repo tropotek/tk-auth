@@ -1,12 +1,12 @@
 {
   "name": "ttek/tk-auth",
   "type": "library",
-  "description": "A base lib for authentication in websites",
+  "description": "An authentication library for ttek based websites",
   "keywords": [
     "tropotek",
     "Auth"
   ],
-  "time": "2019-04-09",
+  "time": "2022-10-15",
   "license": "MIT",
   "authors": [
     {
@@ -23,7 +23,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "3.2.x-dev"
+      "dev-master": "4.0.x-dev"
     }
   }
 }
