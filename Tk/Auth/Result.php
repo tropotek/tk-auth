@@ -4,13 +4,10 @@ namespace Tk\Auth;
 /**
  * Auth result object
  *
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2015 Michael Mifsud
+ * @author Tropotek <http://www.tropotek.com/>
  */
 class Result
 {
-    use \Tk\CollectionTrait;
     
     /**
      * General Failure
@@ -43,13 +40,10 @@ class Result
     const SUCCESS                       =  1;
 
 
-
     /**
      * Authentication result code
-     *
-     * @var int
      */
-    protected $code = 0;
+    protected int $code = 0;
 
     /**
      * The identity used in the authentication attempt
@@ -58,69 +52,50 @@ class Result
      */
     protected $identity = null;
 
-    /**
-     * An array of string reasons why the authentication attempt was unsuccessful
-     * If authentication was successful, this should be an empty array.
-     *
-     * @var array
-     */
-    protected $messages = array();
-
+    protected string $message = '';
 
 
     /**
      * Sets the result code, identity, and failure messages
      *
-     * @param  int     $code
      * @param  mixed   $identity
-     * @param  array   $messages
      */
-    public function __construct($code, $identity, $messages = array())
+    public function __construct(int $code, $identity, string $message = '')
     {
         $this->code     = $code;
         $this->identity = $identity;
-        if (!is_array($messages)) $messages = array($messages);
-        $this->messages = $messages;
+        $this->message = $message;
     }
 
     /**
      * Returns whether the result represents a successful authentication attempt
-     *
-     * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
-        return ($this->code > 0) ? true : false;
+        return ($this->code > 0);
     }
 
     /**
      * getCode() - Get the result code for this authentication attempt
-     *
-     * @return int
      */
-    public function getCode()
+    public function getCode(): int
     {
         return $this->code;
     }
 
     /**
      * Returns the identity used in the authentication attempt
-     *
-     * @return string
      */
-    public function getIdentity()
+    public function getIdentity(): ?string
     {
         return $this->identity;
     }
 
     /**
-     * Returns an array of string reasons why the authentication attempt was unsuccessful
-     * If authentication was successful, this method returns an empty array.
-     *
-     * @return array
+     * Should return why the authentication attempt was unsuccessful
      */
-    public function getMessages()
+    public function getMessage(): string
     {
-        return $this->messages;
+        return $this->message;
     }
 }

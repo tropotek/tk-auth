@@ -4,37 +4,22 @@ namespace Tk\Auth\Adapter;
 use Tk\Auth\Result;
 
 /**
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2016 Michael Mifsud
+ * This object only checks for a valid username and returns a valid result
+ * Use it for testing or if you require a username only login
+ *
+ * @author Tropotek <http://www.tropotek.com/>
  */
-class NullAuth extends Iface
+class NullAuth extends AdapterInterface
 {
 
-    /**
-     * NullAuth constructor.
-     */
-    public function __construct()
+    public function authenticate(): Result
     {
-        parent::__construct();
-
-    }
-
-    /**
-     *
-     * @return Result
-     */
-    public function authenticate()
-    {
-        $username = $this->get('username');
+        // get values from a post or get request
+        $username = $this->getFactory()->getRequest()->get('username');
         if (!$username) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
         }
         try {
-            $this->dispatchLoginProcess();
-            if ($this->getLoginProcessEvent()->getResult()) {
-                return $this->getLoginProcessEvent()->getResult();
-            }
             return new Result(Result::SUCCESS, $username);
         } catch (\Exception $e) {
             \Tk\Log::warning($e->getMessage());

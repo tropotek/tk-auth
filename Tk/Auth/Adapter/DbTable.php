@@ -1,61 +1,31 @@
 <?php
-/*
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2007 Michael Mifsud
- */
 namespace Tk\Auth\Adapter;
+
+use Tk\Auth\Auth;
 use Tk\Auth\Result;
+use Tk\Db\Pdo;
 
 /**
  * A DB table authenticator adaptor
  *
- * This adapter requires that the data values have been set
- * ```
- * $adapter->replace(array('username' => $value, 'password' => $password));
- * ```
+ * This adaptor requires that the password and username are submitted in a POST request
  *
+ * @author Tropotek <http://www.tropotek.com/>
  */
-class DbTable extends Iface
+class DbTable extends AdapterInterface
 {
 
-    /**
-     * @var string
-     */
-    protected $tableName = '';
+    protected string $tableName = '';
 
-    /**
-     * @var string
-     */
-    protected $usernameColumn = '';
+    protected string $usernameColumn = '';
 
-    /**
-     * @var string
-     */
-    protected $passwordColumn = '';
+    protected string $passwordColumn = '';
 
-    /**
-     * @var \Tk\Db\Pdo
-     */
-    protected $db = null;
-
-    /**
-     * @var callable
-     */
-    protected $hashCallback = null;
+    protected Pdo $db;
 
 
-    /**
-     * Constructor
-     * 
-     * @param \Tk\Db\Pdo $db
-     * @param string $tableName
-     * @param string $userColumn
-     * @param string $passColumn
-     */
-    public function __construct(\Tk\Db\Pdo $db, $tableName, $userColumn, $passColumn)
+    public function __construct(Pdo $db, string $tableName, string $userColumn, string $passColumn)
     {
-        parent::__construct();
         $this->db = $db;
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
@@ -63,39 +33,18 @@ class DbTable extends Iface
     }
 
     /**
-     * If a hash function is set then that is used to has a password.
-     * The password and the user stdClass is sent to the function for hashing.
-     *
-     * @param $callable
-     * @return $this
+     * This will hash the password using the $user->hash value as a salt if it exists.
+     * You can override the hash function by using DbTable::setOnHash(callable)
      */
-    public function setHashCallback($callable) 
+    public function hashPassword(string $password, $user = null): string
     {
-        $this->hashCallback = $callable;
-        return $this;
-    }
-
-    /**
-     * Override this method for more secure password encoding
-     *
-     * @param $password
-     * @param \stdClass $user
-     * @return string
-     */
-    public function hashPassword($password, $user = null)
-    {
-        if ($this->hashCallback) {
-            return call_user_func_array($this->hashCallback, array($password, $user));
+        if ($this->getOnHash()) {
+            return call_user_func_array($this->getOnHash(), [$password, $user]);
         }
-        return hash('md5', $password);
+        return Auth::hashPassword($password, $user->hash ?? null);
     }
 
-    /**
-     * @param $username
-     * @return \stdClass
-     * @throws \Tk\Db\Exception
-     */
-    protected function getUserRow($username)
+    protected function getUserRow(string $username): ?\stdClass
     {
         $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
             $this->db->quoteParameter($this->tableName),
@@ -104,23 +53,18 @@ class DbTable extends Iface
         );
 
         $stmt = $this->db->prepare($sql);
-        if (!$stmt->execute()) {
-            $errorInfo = $this->db->errorInfo();
-            $e = new \Tk\Db\Exception($errorInfo[2], 1000, null, print_r($this->db->getLastLog(), true));
-            \Tk\Log::error($e->__toString());
+        if ($stmt->execute()) {
+            return $stmt->fetchObject();
         }
+        return null;
 
-        return $stmt->fetchObject();
     }
 
-    /**
-     * @return Result
-     * @throws \Tk\Auth\Exception if answering the authentication query is impossible
-     */
-    public function authenticate()
+    public function authenticate(): Result
     {
-        $username = $this->get('username');
-        $password = $this->get('password');
+        // get values from a post request only
+        $username = $this->getFactory()->getRequest()->request->get('username');
+        $password = $this->getFactory()->getRequest()->request->get('password');
         
         if (!$username || !$password) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'No username or password.');
@@ -128,12 +72,7 @@ class DbTable extends Iface
 
         try {
             $user = $this->getUserRow($username);
-            // TODO: The password should be modified/hashed before it is sent to the adapter for processing ???
             if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
-                $this->dispatchLoginProcess();
-                if ($this->getLoginProcessEvent()->getResult()) {
-                    return $this->getLoginProcessEvent()->getResult();
-                }
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {
@@ -141,6 +80,5 @@ class DbTable extends Iface
         }
         return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, $username, 'Invalid username or password.');
     }
-
 
 }

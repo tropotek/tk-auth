@@ -4,18 +4,14 @@ namespace Tk\Auth\Storage;
 /**
  * 
  *
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2015 Michael Mifsud
+ * @author Tropotek <http://www.tropotek.com/>
  */
-interface Iface
+interface StorageInterface
 {
     /**
      * Returns true if and only if storage is empty
-     *
-     * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 
     /**
      * Returns the contents of storage
@@ -28,13 +24,12 @@ interface Iface
     /**
      * Writes $contents to storage
      *
-     * @param  mixed $contents
+     * @param mixed $contents
      */
     public function write($contents);
 
     /**
      * Clears contents from storage
-     *
      */
     public function clear();
 }

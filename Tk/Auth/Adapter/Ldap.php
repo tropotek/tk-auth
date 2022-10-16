@@ -5,37 +5,26 @@
  * @license Copyright 2007 Michael Mifsud
  */
 namespace Tk\Auth\Adapter;
+
 use Tk\Auth\Result;
 
 /**
  * LDAP Authentication adapter
  *
- * This adapter requires that the data values have been set
+ * This adapter requires that the password and username are submitted in a POST request
  *
- * ```
- * $adapter->replace(array('username' => $value, 'password' => $password));
- * ```
- *
+ * @author Tropotek <http://www.tropotek.com/>
  */
-class Ldap extends Iface
+class Ldap extends AdapterInterface
 {
 
-    /**
-     * @var string
-     */
-    protected $host = '';
-    /**
-     * @var int
-     */
-    protected $port = 636;
-    /**
-     * @var bool
-     */
-    protected $tls = false;
-    /**
-     * @var string
-     */
-    protected $baseDn = '';
+    protected string $host = '';
+
+    protected int $port = 636;
+
+    protected bool $tls = false;
+
+    protected string $baseDn = '';
 
     /**
      * @var null|resource
@@ -43,17 +32,8 @@ class Ldap extends Iface
     protected $ldap = null;
 
 
-    /**
-     * Constructor
-     *
-     * @param string $host    ldap://centaur.unimelb.edu.au
-     * @param string $baseDn  uid=%s,cn=users,dc=domain,dc=edu
-     * @param int $port
-     * @param bool $tls
-     */
-    public function __construct($host, $baseDn, $port = 636, $tls = false)
+    public function __construct(string $host, string $baseDn, int $port = 636, bool $tls = false)
     {
-        parent::__construct();
         $this->setHost($host);
         $this->setBaseDn($baseDn);
         if ($port <= 0) $port = 636;
@@ -61,16 +41,16 @@ class Ldap extends Iface
         $this->setTls($tls);
     }
 
-
     /**
      * Authenticate the user
      *
      * @return Result
      */
-    public function authenticate()
+    public function authenticate(): Result
     {
-        $username = $this->get('username');
-        $password = $this->get('password');
+        // get values from a post request only
+        $username = $this->getFactory()->getRequest()->request->get('username');
+        $password = $this->getFactory()->getRequest()->request->get('password');
 
         if (!$username || !$password) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, '0000 Invalid username or password.');
@@ -85,10 +65,6 @@ class Ldap extends Iface
             $this->setBaseDn(str_replace('{username}', $username, $this->getBaseDn()));
 
             if (@ldap_bind($this->getLdap(), $this->getBaseDn(), $password)) {
-                $this->dispatchLoginProcess();
-                if ($this->getLoginProcessEvent()->getResult()) {
-                    return $this->getLoginProcessEvent()->getResult();
-                }
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {
@@ -99,9 +75,8 @@ class Ldap extends Iface
     }
 
     /**
-     * @param $baseDn
-     * @param $filter
-     * @return array|resource|false|null
+     * @param array|string $filter
+     * @return array|false|null
      */
     public function ldapSearch($filter)
     {
@@ -122,73 +97,45 @@ class Ldap extends Iface
         return $this->ldap;
     }
 
-    /**
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * @param string $host
-     * @return $this
-     */
-    public function setHost($host)
+    public function setHost(string $host): Ldap
     {
         $this->host = $host;
         return $this;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }
 
-    /**
-     * @param int|string $port
-     * @return $this
-     */
-    public function setPort($port)
+    public function setPort(int $port): Ldap
     {
         $this->port = $port;
         return $this;
     }
 
-    /**
-     * @return bool|string
-     */
-    public function isTls()
+    public function isTls(): bool
     {
         return $this->tls;
     }
 
-    /**
-     * @param bool $tls
-     * @return $this
-     */
-    public function setTls($tls)
+    public function setTls(bool $tls): Ldap
     {
         $this->tls = $tls;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getBaseDn()
+    public function getBaseDn(): string
     {
         return $this->baseDn;
     }
 
-    /**
-     * @param string $baseDn
-     * @return $this
-     */
-    public function setBaseDn($baseDn)
+    public function setBaseDn(string $baseDn): Ldap
     {
         $this->baseDn = $baseDn;
         return $this;

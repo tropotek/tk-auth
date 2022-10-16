@@ -7,12 +7,12 @@
 namespace Tk\Auth\Storage;
 
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
 /**
- *
- *
- *
+ * @author Tropotek <http://www.tropotek.com/>
  */
-class SessionStorage implements Iface
+class SessionStorage implements StorageInterface
 {
     /**
      * Default session namespace
@@ -21,25 +21,16 @@ class SessionStorage implements Iface
 
     /**
      * Session namespace
-     *
-     * @var mixed
      */
-    protected $sid = '';
+    protected string $sid = '';
 
-    /**
-     * @var array|\ArrayAccess
-     */
-    protected $session = null;
-
+    protected Session $session;
 
 
     /**
      * Sets session storage options and initializes session namespace object
-     *
-     * @param array|\ArrayAccess $session
-     * @param string  $sid
      */
-    public function __construct($session, $sid = self::SID_DEFAULT)
+    public function __construct(Session $session, string $sid = self::SID_DEFAULT)
     {
         $this->session = $session;
         $this->sid = $sid;
@@ -47,64 +38,44 @@ class SessionStorage implements Iface
 
     /**
      * Returns the session namespace for this storage object
-     *
-     * @return string
      */
-    public function getSid()
+    public function getSid(): string
     {
         return $this->sid;
     }
 
     /**
-     * Get the session object
-     *
-     * @return array|\ArrayAccess
+     * Get the session storage
      */
-    public function getSession()
+    public function getSession(): Session
     {
         return $this->session;
     }
 
-
-    /**
-     * Defined by \Tk\Auth\Storage\Iface
-     *
-     * @return bool
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return !isset($this->session[$this->getSid()]);
+        return !$this->getSession()->has($this->getSid());
     }
 
     /**
-     * Defined by \Tk\Auth\Storage\Iface
-     *
      * @return mixed
      */
     public function read()
     {
-        return $this->session[$this->getSid()];
+        return $this->getSession()->get($this->getSid());
     }
 
     /**
-     * Defined by \Tk\Auth\Storage\Iface
-     *
-     * @param  mixed $contents
-     * @return void
+     * @param mixed $contents
      */
     public function write($contents)
     {
-        $this->session[$this->getSid()] = $contents;
+        $this->getSession()->set($this->getSid(), $contents);
     }
 
-    /**
-     * Defined by \Tk\Auth\Storage\Iface
-     *
-     * @return void
-     */
     public function clear()
     {
-        unset($this->session[$this->getSid()]);
+        $this->getSession()->remove($this->getSid());
     }
 
 }

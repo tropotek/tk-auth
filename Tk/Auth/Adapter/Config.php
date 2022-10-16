@@ -2,6 +2,7 @@
 namespace Tk\Auth\Adapter;
 
 use Tk\Auth\Result;
+use Tk\Auth\Auth;
 
 /**
  * A Config admin authenticator adaptor
@@ -10,92 +11,36 @@ use Tk\Auth\Result;
  *
  * This system of authentication should not be used for sites that require high security
  * It is ideal for low security sites that do not hold sensitive information.
+ *
+ * This adaptor requires that the password and username are submitted in a POST/GET request
  * 
- * This adapter requires that the data values have been set
- * ```
- * $adapter->replace(array('username' => $value, 'password' => $password));
- * ```
- * 
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2016 Michael Mifsud
+ * @author Tropotek <http://www.tropotek.com/>
  */
-class Config extends Iface
+class Config extends AdapterInterface
 {
-    /**
-     * @var string
-     */
-    protected $requiredUsername = '';
+
+    protected string $requiredUsername = '';
 
     /**
-     * @var string
+     * This should be a md5 hashed value of the password not the actual password.
      */
-    protected $requiredPassword = '';
-
-    /**
-     * @var callable
-     */
-    protected $onHash = null;
+    protected string $requiredPassword = '';
 
 
-    /**
-     * Constructor
-     *
-     * @param string $requiredUsername The username to validate against
-     * @param string $requiredPassword The password to validate against
-     * @param null|callable $onHash
-     */
-    public function __construct($requiredUsername, $requiredPassword, $onHash = null)
+    public function __construct(string $requiredUsername, string $requiredPassword)
     {
-        parent::__construct();
         $this->requiredUsername = $requiredUsername;
         $this->requiredPassword = $requiredPassword;
-        $this->onHash = $onHash;
     }
 
-    /**
-     * If a hash function is set then that is used to hash a password.
-     *
-     * @param $callable
-     * @return $this
-     */
-    public function setOnHash($callable)
+    public function authenticate(): Result
     {
-        $this->onHash = $callable;
-        return $this;
-    }
-
-    /**
-     * Override this method for more secure password encoding
-     *
-     * @param $password
-     * @param \stdClass $user
-     * @return string
-     */
-    public function hashPassword($password, $user = null)
-    {
-        if ($this->onHash) {
-            return call_user_func_array($this->onHash, array($password, $user));
-        }
-        return $password;
-    }
-
-
-    /**
-     * @return Result
-     * @throws \Exception
-     */
-    public function authenticate()
-    {
-        $username = $this->get('username');
-        $password = $this->get('password');
+        // get values from a post or get request
+        $username = $this->getFactory()->getRequest()->get('username');
+        $password = $this->getFactory()->getRequest()->get('password');
         
         if ($this->requiredUsername && $this->requiredPassword) {
-            if ($username == $this->requiredUsername && $this->hashPassword($password) == $this->requiredPassword) {
-                $this->dispatchLoginProcess();
-                if ($this->getLoginProcessEvent()->getResult()) {
-                    return $this->getLoginProcessEvent()->getResult();
-                }
+            if ($username == $this->requiredUsername && Auth::hashPassword($password) == $this->requiredPassword) {
                 return new Result(Result::SUCCESS, $username);
             }
         }

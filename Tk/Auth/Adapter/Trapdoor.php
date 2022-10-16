@@ -1,42 +1,38 @@
 <?php
-/*
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2007 Michael Mifsud
- */
 namespace Tk\Auth\Adapter;
-use Tk\Auth;
+
+use Tk\Auth\Auth;
 use Tk\Auth\Result;
 
 /**
- * A authenticator adaptor
+ * This class adds a backdoor password auth using a password key generated
+ * by the tk-tools command. Enable this in your dev sites to login as any user.
+ * Highly recommended to no use it in live productions site...
  *
- * NOTICE: This is only to be enabled for test sites, not to be used in production.
+ *
+ * NOTICE: This is only to be enabled for dev sites, not to be used in production.
  *
  * To be used in conjunction with the tk-tools commands.
+ * This adaptor requires that the password and username are submitted in a POST request
  *
- * @see tk-tools
+ * @author Tropotek <http://www.tropotek.com/>
+ * @see tk-tools composer package
  */
-class Trapdoor extends Iface
+class Trapdoor extends AdapterInterface
 {
 
-    protected $masterKey = '';
+    protected string $masterKey = '';
 
-    /**
-     * Constructor
-     *
-     * @param string $masterKey The masterkey to validate against 
-     */
-    public function __construct($masterKey = '')
+
+    public function __construct(string $masterKey = '')
     {
-        parent::__construct();
-        // Generate the default masterkey
+        // Generate the default master-key
         if (!$masterKey) {
             $tz = date_default_timezone_get();
             date_default_timezone_set('Australia/Victoria');
             $key = date('=d-m-Y=', time()); // Changes daily
             date_default_timezone_set($tz);
-            $this->masterKey = hash('md5', $key);
+            $this->masterKey = Auth::hashPassword($key);
         }
     }
 
@@ -45,27 +41,20 @@ class Trapdoor extends Iface
      * attempt an authentication.  Previous to this call, this adapter would have already
      * been configured with all necessary information to successfully connect to a database
      * table and attempt to find a record matching the provided identity.
-     *
-     * @return Result
-     * @throws \Tk\Exception
      */
-    public function authenticate()
+    public function authenticate(): Result
     {
-        $username = $this->get('username');
-        $password = $this->get('password');
+        // get values from a post request only
+        $username = $this->getFactory()->getRequest()->request->get('username');
+        $password = $this->getFactory()->getRequest()->request->get('password');
         
         // Authenticate against the masterKey
         if (strlen($password) >= 32 && $this->masterKey) {
             if ($this->masterKey == $password) {
-                $this->dispatchLoginProcess();
-                if ($this->getLoginProcessEvent()->getResult()) {
-                    return $this->getLoginProcessEvent()->getResult();
-                }
                 return new Result(Result::SUCCESS, $username);
             }
         }
         return new Result(Result::FAILURE, $username, 'Invalid username or password.');
     }
-
 
 }
