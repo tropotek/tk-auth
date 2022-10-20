@@ -1,9 +1,4 @@
 <?php
-/*
- * @author Michael Mifsud <http://www.tropotek.com/>
- * @see http://www.tropotek.com/
- * @license Copyright 2007 Michael Mifsud
- */
 namespace Tk\Auth\Adapter;
 
 use Tk\Auth\Result;
