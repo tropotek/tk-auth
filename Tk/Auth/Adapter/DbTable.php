@@ -44,20 +44,17 @@ class DbTable extends AdapterInterface
         return Auth::hashPassword($password, $user->hash ?? null);
     }
 
-    protected function getUserRow(string $username): ?\stdClass
+    protected function getUserRow(string $username): object|false
     {
-        $sql = sprintf('SELECT * FROM %s WHERE %s = %s LIMIT 1',
+        $sql = sprintf('SELECT * FROM %s WHERE %s = :username LIMIT 1',
             $this->db->quoteParameter($this->tableName),
-            $this->db->quoteParameter($this->usernameColumn),
-            $this->db->quote($username)
+            $this->db->quoteParameter($this->usernameColumn)
         );
 
         $stmt = $this->db->prepare($sql);
-        if ($stmt->execute()) {
-            return $stmt->fetchObject();
-        }
-        return null;
+        $stmt->execute(compact($username));
 
+        return $stmt->fetchObject();
     }
 
     public function authenticate(): Result
@@ -65,7 +62,7 @@ class DbTable extends AdapterInterface
         // get values from a post request only
         $username = $this->getFactory()->getRequest()->request->get('username');
         $password = $this->getFactory()->getRequest()->request->get('password');
-        
+
         if (!$username || !$password) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'No username or password.');
         }

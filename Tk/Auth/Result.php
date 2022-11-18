@@ -8,7 +8,7 @@ namespace Tk\Auth;
  */
 class Result
 {
-    
+
     /**
      * General Failure
      */
@@ -47,20 +47,16 @@ class Result
 
     /**
      * The identity used in the authentication attempt
-     *
-     * @var mixed
      */
-    protected $identity = null;
+    protected mixed $identity = null;
 
     protected string $message = '';
 
 
     /**
      * Sets the result code, identity, and failure messages
-     *
-     * @param  mixed   $identity
      */
-    public function __construct(int $code, $identity, string $message = '')
+    public function __construct(int $code, mixed $identity, string $message = '')
     {
         $this->code     = $code;
         $this->identity = $identity;
@@ -86,7 +82,7 @@ class Result
     /**
      * Returns the identity used in the authentication attempt
      */
-    public function getIdentity(): ?string
+    public function getIdentity(): mixed
     {
         return $this->identity;
     }

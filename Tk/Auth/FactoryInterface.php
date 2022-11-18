@@ -23,8 +23,7 @@ interface FactoryInterface
     /**
      * Return a User object or record that is located from the Auth's getIdentity() method
      * Override this method in your own site's Factory object
-     * @return null|mixed Null if no user logged in
      */
-    public function getAuthUser();
+    public function getAuthUser(): mixed;
 
 }

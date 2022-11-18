@@ -2,8 +2,6 @@
 namespace Tk\Auth\Storage;
 
 /**
- * 
- *
  * @author Tropotek <http://www.tropotek.com/>
  */
 interface StorageInterface
@@ -16,17 +14,13 @@ interface StorageInterface
     /**
      * Returns the contents of storage
      * Behavior is undefined when storage is empty.
-     *
-     * @return mixed
      */
-    public function read();
+    public function read(): mixed;
 
     /**
      * Writes $contents to storage
-     *
-     * @param mixed $contents
      */
-    public function write($contents);
+    public function write(mixed $contents);
 
     /**
      * Clears contents from storage

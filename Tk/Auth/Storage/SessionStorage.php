@@ -1,7 +1,6 @@
 <?php
 namespace Tk\Auth\Storage;
 
-
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -52,18 +51,12 @@ class SessionStorage implements StorageInterface
         return !$this->getSession()->has($this->getSid());
     }
 
-    /**
-     * @return mixed
-     */
-    public function read()
+    public function read(): mixed
     {
         return $this->getSession()->get($this->getSid());
     }
 
-    /**
-     * @param mixed $contents
-     */
-    public function write($contents)
+    public function write(mixed $contents)
     {
         $this->getSession()->set($this->getSid(), $contents);
     }

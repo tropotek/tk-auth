@@ -11,9 +11,6 @@ use Tk\Auth\Storage\StorageInterface;
 class Auth
 {
 
-    /**
-     * Persistent storage handler
-     */
     protected StorageInterface $storage;
 
     public ?Result $loginResult = null;
@@ -34,10 +31,8 @@ class Auth
 
     /**
      * Returns the user identity value from storage or null if non is available
-     *
-     * @return null|mixed
      */
-    public function getIdentity()
+    public function getIdentity(): mixed
     {
         $storage = $this->getStorage();
         if (!$storage->isEmpty()) {
@@ -48,8 +43,6 @@ class Auth
 
     /**
      * Returns the persistent storage handler
-     *
-     * @return StorageInterface
      */
     public function getStorage(): StorageInterface
     {
