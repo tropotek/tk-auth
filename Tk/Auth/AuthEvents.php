@@ -57,6 +57,13 @@ final class AuthEvents
     const RECOVER_PASS = 'auth.onRecoverPass';
 
     /**
+     * Called when a new user is required to create a password
+     *
+     * @event \Tk\Event\Event
+     */
+    const ACTIVATE = 'auth.onActivate';
+
+    /**
      * Called when a new user submits a registration request
      *
      * @event \Tk\Event\Event
