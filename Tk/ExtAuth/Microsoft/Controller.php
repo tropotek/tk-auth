@@ -88,8 +88,12 @@ class Controller
                 $username = $idToken->preferred_username;   // Email
                 $name = $idToken->name;
                 $uid = $idToken->oid;           // unique ID to identify the MS user
+                // is unimellb =>  0e5bf3cf-1ff4-46b7-9176-52c538c22a4d
+
                 $userTennantId = $idToken->tid; // Company/institution ID get this from the institution if available
-                //vd(explode('/', $idToken->iss));
+
+                vd(explode('/', $idToken->iss));
+                vd($token->getProfile());
 
                 // Try to find an existing user
                 $user = $this->getConfig()->getUserMapper()->findByEmail($username);
@@ -105,11 +109,13 @@ class Controller
                     $user->setEmail($username);
                     $user->save();
                 }
+                $token->userId = $user->getId();
+                $token->save();
+
                 $this->getConfig()->getAuth()->getStorage()->write($user->getUsername());
                 if ($user && $user->isActive()) {
                     $this->getConfig()->setAuthUser($user);
                 }
-
             }
 
         } else {    // if (sessionKey)
@@ -124,7 +130,6 @@ class Controller
                 $oAuthURL->redirect();
             }
         }
-
 
         return <<<HTML
 <p>Loggin you in.</p>
