@@ -39,7 +39,7 @@ class Auth
     }
 
     /**
-     * Returns true if and only if an identity is available from storage
+     * Returns true if an identity is available from storage
      *
      * @return bool
      */
