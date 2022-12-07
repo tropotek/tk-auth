@@ -1,5 +1,9 @@
 #CHANGELOG#
 
+Ver 3.2.10 [2022-12-08]:
+-------------------------------
+
+
 Ver 3.2.8 [2022-12-01]:
 -------------------------------
   - Added new activate page and tests for dbTable authentication
