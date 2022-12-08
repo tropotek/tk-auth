@@ -93,7 +93,6 @@ class Controller
                 $userTennantId = $idToken->tid; // Company/institution ID get this from the institution if available
 
                 vd(explode('/', $idToken->iss));
-                vd($token->getProfile());
 
                 // Try to find an existing user
                 $user = $this->getConfig()->getUserMapper()->findByEmail($username);
