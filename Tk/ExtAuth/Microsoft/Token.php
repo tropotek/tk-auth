@@ -57,7 +57,6 @@ class Token extends Model
 
     public function delete()
     {
-        //$this->sendGetRequest($this->getConfig()->get('auth.microsoft.logout'), '');
         return parent::delete();
     }
 

@@ -12,7 +12,41 @@ use Tk\Log;
 use Tk\Request;
 use Tk\Uri;
 
-class Controller
+
+/**
+ * Azure: https://portal.azure.com/
+ * You must setup the app in Azure te get these values. This will not be covered here.
+ *
+ * Add the following to the config.php
+ * ```
+ *   // Microsoft SSO settings
+ *   $config['auth.microsoft.enabled'] = true;
+ *   // tennant ID or `common` for multi-tenant
+ *   $config['auth.microsoft.tenantid'] = 'common';
+ *   $config['auth.microsoft.clientid'] = '';
+ *   $config['auth.microsoft.logout'] = 'https://login.microsoftonline.com/common/wsfederation?wa=wsignout1.0';
+ *   $config['auth.microsoft.scope'] = 'openid offline_access profile user.read';
+ *   // method = 'certificate' or 'secret'
+ *   $config['auth.microsoft.oauth.method'] = 'secret';
+ *   $config['auth.microsoft.oauth.secret'] = '';
+ *   // on Windows, the certificate paths should be in the form c:/path/to/cert.crt
+ *   //$config['auth.microsoft.oauth.certfile'] = '/data/cert/certificate.crt';
+ *   //$config['auth.microsoft.oauth.keyfile'] = '/data/cert/privatekey.pem';
+ * ```
+ * Add the following routes:
+ * ```
+ *    $routes->add('login-microsoft', Route::create('/microsoftLogin.html', 'Tk\ExtAuth\Microsoft\Controller::doLogin'));
+ *    $routes->add('auth-microsoft', Route::create('/microsoftAuth.html',  'Tk\ExtAuth\Microsoft\Controller::doAuth'));
+ * ```
+ * Add the following to the login page:
+ * ```
+ *    <a href="/microsoftLogin.html" class="btn btn-lg btn-default col-12" choice="microsoft">Microsoft</a>
+ * ```
+ *
+ *
+ *
+ */
+class Controller extends \Bs\Controller\Iface
 {
     use ConfigTrait;
 
@@ -23,8 +57,35 @@ class Controller
     private $oAuthChallengeMethod = '';
 
 
+    /**
+     * Login constructor.
+     */
+    public function __construct()
+    {
+        $this->setPageTitle('Login');
+    }
+
+    /**
+     * @return \Tk\Controller\Page
+     */
+    public function getPage()
+    {
+        if (!$this->page) {
+            $templatePath = '';
+            if ($this->getConfig()->get('template.login')) {
+                $templatePath = $this->getConfig()->getSitePath() . $this->getConfig()->get('template.login');
+            }
+            $this->page = $this->getConfig()->getPage($templatePath);
+        }
+        return parent::getPage();
+    }
+
     public function doLogin(Request $request)
     {
+        if (!$this->getConfig()->get('auth.microsoft.enabled')) {
+            throw new Exception('Microsoft authentication not enabled on this site.');
+        }
+
         TokenMap::create()->installTable();
 
         // If logged in already Logout of current account
@@ -85,14 +146,12 @@ class Controller
             // Populate userData and userName from the JWT stored in the database.
             if ($token->idToken) {
                 $idToken = json_decode($token->idToken);
-                $username = $idToken->preferred_username;   // Email
+                // Email (use domain portion to ident institution)
+                // If not found check the site standard users for a match (exclude admin)
+                $username = $idToken->preferred_username;
                 $name = $idToken->name;
-                $uid = $idToken->oid;           // unique ID to identify the MS user
-                // is unimellb =>  0e5bf3cf-1ff4-46b7-9176-52c538c22a4d
-
-                $userTennantId = $idToken->tid; // Company/institution ID get this from the institution if available
-
-                vd(explode('/', $idToken->iss));
+                //$uid = $idToken->oid;           // unique ID to identify the MS user
+                //vd($idToken);
 
                 // Try to find an existing user
                 $user = $this->getConfig()->getUserMapper()->findByEmail($username);
@@ -101,7 +160,6 @@ class Controller
                 }
                 if (!$user) {
                     $user = new User();
-                    $user->setUid($uid);
                     $user->setType(User::TYPE_MEMBER);
                     $user->setName($name);
                     $user->setUsername($username);
@@ -115,28 +173,20 @@ class Controller
                 if ($user && $user->isActive()) {
                     $this->getConfig()->setAuthUser($user);
                 }
+                // Redirect to home page
+                \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
             }
 
         } else {    // if (sessionKey)
-            if ($request->has('login')) {
-                $this->doAuthChallenge();
-                $sessionKey = Token::makeSessionKey();
-                $this->getSession()->set(Token::SESSION_KEY, $sessionKey);
-                $token = Token::create($sessionKey, Uri::create()->reset()->toString(), $this->oAuthVerifier);
-                $token->save();
+            $this->doAuthChallenge();
+            $sessionKey = Token::makeSessionKey();
+            $this->getSession()->set(Token::SESSION_KEY, $sessionKey);
+            $token = Token::create($sessionKey, Uri::create()->reset()->toString(), $this->oAuthVerifier);
+            $token->save();
 
-                $oAuthURL = $this->getMsAuthUrl();
-                $oAuthURL->redirect();
-            }
+            $oAuthURL = $this->getMsAuthUrl();
+            $oAuthURL->redirect();
         }
-
-        return <<<HTML
-<p>Loggin you in.</p>
-<p><small>This windows should cose in a few seconds.</small></p>
-<script>
-    window.opener.postMessage('closing', window.opener);
-</script>
-HTML;
 
     }
 
@@ -263,5 +313,34 @@ HTML;
     {
         return str_replace('=', '', strtr(base64_encode($toEncode), '+/', '-_'));
     }
+
+
+    /**
+     * @return \Dom\Template
+     */
+    public function show()
+    {
+        $template = parent::show();
+
+        return $template;
+    }
+
+
+
+    /**
+     * @return \Dom\Template
+     */
+    public function __makeTemplate()
+    {
+        $xhtml = <<<HTML
+<div class="tk-microsoft-auth">
+<p>Logging you in.</p>
+</div>
+HTML;
+
+        return \Dom\Loader::load($xhtml);
+    }
+
+
 
 }
