@@ -366,7 +366,7 @@ class Controller extends \Bs\Controller\Iface
     {
         $xhtml = <<<HTML
 <div class="tk-microsoft-auth">
-<p var="no-error">Logging you in.</p>
+<p choice="no-error">Logging you in.</p>
 <p var="error" choice="error"></p>
 </div>
 HTML;
