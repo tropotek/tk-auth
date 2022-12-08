@@ -232,7 +232,7 @@ class Controller extends \Bs\Controller\Iface
 
     protected function getMsAuthUrl(): Uri
     {
-        $url = Uri::create('https://login.microsoftonline.com/' . $this->getConfig()->get('auth.microsoft.tenantid') . '/oauth2/v2.0/' . 'authorize');
+        $url = Uri::create('https://login.microsoftonline.com/' . $this->getConfig()->get('auth.microsoft.tenantid') . '/oauth2/v2.0/authorize');
         $url->set('response_type', 'code');
         $url->set('client_id', $this->getConfig()->get('auth.microsoft.clientid'));
         $url->set('redirect_uri', Uri::create('/microsoftAuth.html')->toString());
