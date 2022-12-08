@@ -81,6 +81,16 @@ class Controller extends \Bs\Controller\Iface
         return parent::getPage();
     }
 
+    protected function getLoginUrl()
+    {
+        return Uri::create('/microsoftLogin.html');
+    }
+
+    protected function getAuthUrl()
+    {
+        return Uri::create('/microsoftAuth.html');
+    }
+
     public function doLogin(Request $request)
     {
         if (!$this->getConfig()->get('auth.microsoft.enabled')) {
@@ -108,7 +118,7 @@ class Controller extends \Bs\Controller\Iface
             if (!($token && $token->idToken)) {
                 $this->getConfig()->getSession()->remove(Token::SESSION_KEY);
                 $this->getConfig()->getSession()->destroy();
-                Uri::create()->reset()->redirect();
+                Uri::create()->redirect();
             }
 
             if ($token->isExpiring()) {
@@ -123,7 +133,7 @@ class Controller extends \Bs\Controller\Iface
 
                     if ($reply->error) {
                         if (substr($reply->error_description, 0, 12) == 'AADSTS70008:') {
-                            $token->redirect = Uri::create('/microsoftLogin.html')->toString();
+                            $token->redirect = $this->getLoginUrl()->toString();
                             $token->refreshToken = '';
                             $token->expires = Date::create()->add(new \DateInterval('PT5M'));
                             $token->save();
@@ -153,7 +163,7 @@ class Controller extends \Bs\Controller\Iface
             $this->doAuthChallenge();
             $sessionKey = Token::makeSessionKey();
             $this->getSession()->set(Token::SESSION_KEY, $sessionKey);
-            $token = Token::create($sessionKey, Uri::create()->reset()->toString(), $this->oAuthVerifier);
+            $token = Token::create($sessionKey, $this->getLoginUrl()->toString(), $this->oAuthVerifier);
             $token->save();
 
             $oAuthURL = $this->getMsAuthUrl();
@@ -219,7 +229,7 @@ class Controller extends \Bs\Controller\Iface
         }
         $oauthRequest = $this->generateOauthRequest(
             'grant_type=authorization_code&client_id=' . $this->getConfig()->get('auth.microsoft.clientid') .
-            '&redirect_uri=' . urlencode(Uri::create('/microsoftAuth.html')->toString()) .
+            '&redirect_uri=' . urlencode($this->getAuthUrl()->toString()) .
             '&code=' . $request->get('code') .
             '&code_verifier=' . $token->codeVerifier
         );
@@ -250,7 +260,7 @@ class Controller extends \Bs\Controller\Iface
         $url = Uri::create('https://login.microsoftonline.com/' . $this->getConfig()->get('auth.microsoft.tenantid') . '/oauth2/v2.0/authorize');
         $url->set('response_type', 'code');
         $url->set('client_id', $this->getConfig()->get('auth.microsoft.clientid'));
-        $url->set('redirect_uri', Uri::create('/microsoftAuth.html')->toString());
+        $url->set('redirect_uri', $this->getAuthUrl()->toString());
         $url->set('scope', $this->getConfig()->get('auth.microsoft.scope'));
         $url->set('code_challenge', $this->oAuthChallenge);
         $url->set('code_challenge_method', $this->oAuthChallengeMethod);
