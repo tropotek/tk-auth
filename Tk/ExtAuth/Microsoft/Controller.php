@@ -56,6 +56,7 @@ class Controller extends \Bs\Controller\Iface
 
     private $oAuthChallengeMethod = '';
 
+    protected $error = '';
 
     /**
      * Login constructor.
@@ -145,36 +146,7 @@ class Controller extends \Bs\Controller\Iface
 
             // Populate userData and userName from the JWT stored in the database.
             if ($token->idToken) {
-                $idToken = json_decode($token->idToken);
-                // Email (use domain portion to ident institution)
-                // If not found check the site standard users for a match (exclude admin)
-                $username = $idToken->preferred_username;
-                $name = $idToken->name;
-                //$uid = $idToken->oid;           // unique ID to identify the MS user
-                //vd($idToken);
-
-                // Try to find an existing user
-                $user = $this->getConfig()->getUserMapper()->findByEmail($username);
-                if (!$user) {
-                    $user = $this->getConfig()->getUserMapper()->findByUsername($username);
-                }
-                if (!$user) {
-                    $user = new User();
-                    $user->setType(User::TYPE_MEMBER);
-                    $user->setName($name);
-                    $user->setUsername($username);
-                    $user->setEmail($username);
-                    $user->save();
-                }
-                $token->userId = $user->getId();
-                $token->save();
-
-                $this->getConfig()->getAuth()->getStorage()->write($user->getUsername());
-                if ($user && $user->isActive()) {
-                    $this->getConfig()->setAuthUser($user);
-                }
-                // Redirect to home page
-                \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
+                $this->findUser($token);
             }
 
         } else {    // if (sessionKey)
@@ -188,6 +160,49 @@ class Controller extends \Bs\Controller\Iface
             $oAuthURL->redirect();
         }
 
+    }
+
+    /**
+     * Find/Create user once the token is validated.
+     *
+     * redirect to user homepage or set an error if not found
+     *
+     * @param Token $token
+     * @return void
+     * @throws \Exception
+     */
+    protected function findUser($token)
+    {
+        $idToken = json_decode($token->idToken);
+        // Email (use domain portion to ident institution)
+        // If not found check the site standard users for a match (exclude admin)
+        $username = $idToken->preferred_username;
+        $name = $idToken->name;
+        //$uid = $idToken->oid;           // unique ID to identify the MS user
+        //vd($idToken);
+
+        // Try to find an existing user
+        $user = $this->getConfig()->getUserMapper()->findByEmail($username);
+        if (!$user) {
+            $user = $this->getConfig()->getUserMapper()->findByUsername($username);
+        }
+        if (!$user) {
+            $user = new User();
+            $user->setType(User::TYPE_MEMBER);
+            $user->setName($name);
+            $user->setUsername($username);
+            $user->setEmail($username);
+            $user->save();
+        }
+        $token->userId = $user->getId();
+        $token->save();
+
+        $this->getConfig()->getAuth()->getStorage()->write($user->getUsername());
+        if ($user && $user->isActive()) {
+            $this->getConfig()->setAuthUser($user);
+        }
+        // Redirect to home page
+        \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
     }
 
 
@@ -322,6 +337,13 @@ class Controller extends \Bs\Controller\Iface
     {
         $template = parent::show();
 
+        if ($this->error) {
+            $template->insertText('error', 'Error: ' . $this->error);
+            $template->setVisible('error');
+        } else {
+            $template->setVisible('no-error');
+        }
+
         return $template;
     }
 
@@ -334,7 +356,8 @@ class Controller extends \Bs\Controller\Iface
     {
         $xhtml = <<<HTML
 <div class="tk-microsoft-auth">
-<p>Logging you in.</p>
+<p var="no-error">Logging you in.</p>
+<p var="error" choice="error"></p>
 </div>
 HTML;
 
