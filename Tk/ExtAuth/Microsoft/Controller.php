@@ -43,8 +43,6 @@ use Tk\Uri;
  *    <a href="/microsoftLogin.html" class="btn btn-lg btn-default col-12" choice="microsoft">Microsoft</a>
  * ```
  *
- *
- *
  */
 class Controller extends \Bs\Controller\Iface
 {
@@ -89,6 +87,44 @@ class Controller extends \Bs\Controller\Iface
     protected function getAuthUrl()
     {
         return Uri::create('/microsoftAuth.html');
+    }
+
+    /**
+     * Find/Create user once the token is validated.
+     * redirect to user homepage or set an error if not found
+     *
+     * @param Token $token
+     * @return void
+     * @throws \Exception
+     */
+    protected function findUser($token)
+    {
+        $idToken = json_decode($token->idToken);
+        $username = $idToken->preferred_username;
+        $name = $idToken->name;
+
+        // Try to find an existing user
+        $user = $this->getConfig()->getUserMapper()->findByEmail($username);
+        if (!$user) {
+            $user = $this->getConfig()->getUserMapper()->findByUsername($username);
+        }
+        if (!$user) {
+            $user = new User();
+            $user->setType(User::TYPE_MEMBER);
+            $user->setName($name);
+            $user->setUsername($username);
+            $user->setEmail($username);
+            $user->save();
+        }
+        $token->userId = $user->getId();
+        $token->save();
+
+        $this->getConfig()->getAuth()->getStorage()->write($this->getConfig()->getUserIdentity($user));
+        if ($user && $user->isActive()) {
+            $this->getConfig()->setAuthUser($user);
+        }
+        // Redirect to home page
+        \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
     }
 
     public function doLogin(Request $request)
@@ -169,52 +205,7 @@ class Controller extends \Bs\Controller\Iface
             $oAuthURL = $this->getMsAuthUrl();
             $oAuthURL->redirect();
         }
-
     }
-
-    /**
-     * Find/Create user once the token is validated.
-     *
-     * redirect to user homepage or set an error if not found
-     *
-     * @param Token $token
-     * @return void
-     * @throws \Exception
-     */
-    protected function findUser($token)
-    {
-        $idToken = json_decode($token->idToken);
-        // Email (use domain portion to ident institution)
-        // If not found check the site standard users for a match (exclude admin)
-        $username = $idToken->preferred_username;
-        $name = $idToken->name;
-        //$uid = $idToken->oid;           // unique ID to identify the MS user
-        //vd($idToken);
-
-        // Try to find an existing user
-        $user = $this->getConfig()->getUserMapper()->findByEmail($username);
-        if (!$user) {
-            $user = $this->getConfig()->getUserMapper()->findByUsername($username);
-        }
-        if (!$user) {
-            $user = new User();
-            $user->setType(User::TYPE_MEMBER);
-            $user->setName($name);
-            $user->setUsername($username);
-            $user->setEmail($username);
-            $user->save();
-        }
-        $token->userId = $user->getId();
-        $token->save();
-
-        $this->getConfig()->getAuth()->getStorage()->write($user->getUsername());
-        if ($user && $user->isActive()) {
-            $this->getConfig()->setAuthUser($user);
-        }
-        // Redirect to home page
-        \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
-    }
-
 
     public function doAuth(Request $request)
     {
@@ -254,7 +245,6 @@ class Controller extends \Bs\Controller\Iface
         $redirect->redirect();
     }
 
-
     protected function getMsAuthUrl(): Uri
     {
         $url = Uri::create('https://login.microsoftonline.com/' . $this->getConfig()->get('auth.microsoft.tenantid') . '/oauth2/v2.0/authorize');
@@ -264,7 +254,6 @@ class Controller extends \Bs\Controller\Iface
         $url->set('scope', $this->getConfig()->get('auth.microsoft.scope'));
         $url->set('code_challenge', $this->oAuthChallenge);
         $url->set('code_challenge_method', $this->oAuthChallengeMethod);
-
         return $url;
     }
 
@@ -287,7 +276,6 @@ class Controller extends \Bs\Controller\Iface
         $this->oAuthChallenge = str_replace('=', '', strtr(base64_encode(pack('H*', hash('sha256', $verifier))), '+/', '-_'));
         $this->oAuthChallengeMethod = 'S256';
     }
-
 
     protected function generateOauthRequest($data)
     {
@@ -338,7 +326,6 @@ class Controller extends \Bs\Controller\Iface
     {
         return str_replace('=', '', strtr(base64_encode($toEncode), '+/', '-_'));
     }
-
 
     /**
      * @return \Dom\Template
