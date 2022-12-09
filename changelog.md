@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.2.12 [2022-12-10]:
+-------------------------------
+  - Merge branch '3.2' of https://github.com/tropotek/tk-auth into 3.2
+
+
 Ver 3.2.10 [2022-12-08]:
 -------------------------------
 
