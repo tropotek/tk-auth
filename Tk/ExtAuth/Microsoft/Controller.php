@@ -132,117 +132,131 @@ class Controller extends \Bs\Controller\Iface
         if (!$this->getConfig()->get('auth.microsoft.enabled')) {
             throw new Exception('Microsoft authentication not enabled on this site.');
         }
+        $token = null;
 
-        TokenMap::create()->installTable();
+        try {
+            TokenMap::create()->installTable();
 
-        // If logged in already Logout of current account
-        if ($this->getAuthUser()) {
-            // logout user
-            $event = new AuthEvent();
-            $this->getConfig()->getEventDispatcher()->dispatch(AuthEvents::LOGOUT, $event);
-            Uri::create()->redirect();
-        }
-
-        // get existing token if one exists
-        $sessionKey = $this->getSession()->get(Token::SESSION_KEY, '');
-
-        if ($sessionKey) {
-            $token = TokenMap::create()->findBySessionKey($sessionKey);
-            $this->oAuthVerifier = $token->codeVerifier;
-            $this->doAuthChallenge();
-            // invalidate session if token not valid
-            if (!($token && $token->idToken)) {
-                $this->getConfig()->getSession()->remove(Token::SESSION_KEY);
-                $this->getConfig()->getSession()->destroy();
+            // If logged in already Logout of current account
+            if ($this->getAuthUser()) {
+                // logout user
+                $event = new AuthEvent();
+                $this->getConfig()->getEventDispatcher()->dispatch(AuthEvents::LOGOUT, $event);
                 Uri::create()->redirect();
             }
 
-            if ($token->isExpiring()) {
-                if ($token->refreshToken) {
-                    $oauthRequest = $this->generateOauthRequest(
-                        'grant_type=refresh_token&refresh_token=' . $token->refreshToken .
-                        '&client_id=' . $this->getConfig()->get('auth.microsoft.clientid') .
-                        '&scope=' . $this->getConfig()->get('auth.microsoft.scope')
-                    );
-                    $response = $this->postOauthRequest('token', $oauthRequest);
-                    $reply = json_decode($response);
+            // get existing token if one exists
+            $sessionKey = $this->getSession()->get(Token::SESSION_KEY, '');
 
-                    if ($reply->error) {
-                        if (substr($reply->error_description, 0, 12) == 'AADSTS70008:') {
-                            $token->redirect = $this->getLoginUrl()->toString();
-                            $token->refreshToken = '';
-                            $token->expires = Date::create()->add(new \DateInterval('PT5M'));
-                            $token->save();
-
-                            $oAuthURL = $this->getMsAuthUrl();
-                            $oAuthURL->redirect();
-                        }
-                        throw new Exception($reply->error_description);
-                    }
-
-                    $idToken = base64_decode(explode('.', $reply->id_token)[1]);
-                    $token->token = $reply->access_token;
-                    $token->refreshToken = $reply->refresh_token;
-                    $token->idToken = $idToken;
-                    $token->redirect = '';
-                    $token->expires = Date::create()->add(new \DateInterval('PT' . $reply->expires_in . 'S'));
-                    $token->save();
+            if ($sessionKey) {
+                $token = TokenMap::create()->findBySessionKey($sessionKey);
+                $this->oAuthVerifier = $token->codeVerifier;
+                $this->doAuthChallenge();
+                // invalidate session if token not valid
+                if (!($token && $token->idToken)) {
+                    $this->getConfig()->getSession()->remove(Token::SESSION_KEY);
+                    $this->getConfig()->getSession()->destroy();
+                    Uri::create()->redirect();
                 }
+
+                if ($token->isExpiring()) {
+                    if ($token->refreshToken) {
+                        $oauthRequest = $this->generateOauthRequest(
+                            'grant_type=refresh_token&refresh_token=' . $token->refreshToken .
+                            '&client_id=' . $this->getConfig()->get('auth.microsoft.clientid') .
+                            '&scope=' . $this->getConfig()->get('auth.microsoft.scope')
+                        );
+                        $response = $this->postOauthRequest('token', $oauthRequest);
+                        $reply = json_decode($response);
+
+                        if ($reply->error) {
+                            if (substr($reply->error_description, 0, 12) == 'AADSTS70008:') {
+                                $token->redirect = $this->getLoginUrl()->toString();
+                                $token->refreshToken = '';
+                                $token->expires = Date::create()->add(new \DateInterval('PT5M'));
+                                $token->save();
+
+                                $oAuthURL = $this->getMsAuthUrl();
+                                $oAuthURL->redirect();
+                            }
+                            throw new Exception($reply->error_description);
+                        }
+
+                        $idToken = base64_decode(explode('.', $reply->id_token)[1]);
+                        $token->token = $reply->access_token;
+                        $token->refreshToken = $reply->refresh_token;
+                        $token->idToken = $idToken;
+                        $token->redirect = '';
+                        $token->expires = Date::create()->add(new \DateInterval('PT' . $reply->expires_in . 'S'));
+                        $token->save();
+                    }
+                }
+
+                // Populate userData and userName from the JWT stored in the database.
+                if ($token->idToken) {
+                    $this->findUser($token);
+                }
+
+            } else {    // if (sessionKey)
+                $this->doAuthChallenge();
+                $sessionKey = Token::makeSessionKey();
+                $this->getSession()->set(Token::SESSION_KEY, $sessionKey);
+                $token = Token::create($sessionKey, $this->getLoginUrl()->toString(), $this->oAuthVerifier);
+                $token->save();
+
+                $oAuthURL = $this->getMsAuthUrl();
+                $oAuthURL->redirect();
             }
-
-            // Populate userData and userName from the JWT stored in the database.
-            if ($token->idToken) {
-                $this->findUser($token);
+        } catch (\Exception $e) {
+            if ($token && $token->getId()) {
+                $token->delete();
             }
-
-        } else {    // if (sessionKey)
-            $this->doAuthChallenge();
-            $sessionKey = Token::makeSessionKey();
-            $this->getSession()->set(Token::SESSION_KEY, $sessionKey);
-            $token = Token::create($sessionKey, $this->getLoginUrl()->toString(), $this->oAuthVerifier);
-            $token->save();
-
-            $oAuthURL = $this->getMsAuthUrl();
-            $oAuthURL->redirect();
         }
     }
 
     public function doAuth(Request $request)
     {
-        if ($request->get('error')) {
-            throw new Exception($request->get('error'));
-        }
+        $token = null;
+        try {
+            if ($request->get('error')) {
+                throw new Exception($request->get('error'));
+            }
 
-        $token = TokenMap::create()->findBySessionKey($this->getSession()->get(Token::SESSION_KEY, ''));
-        if (!$token) {
-            Log::Error('MS oAuth validation failed!');
-            Uri::create('/')->redirect();
-        }
-        $oauthRequest = $this->generateOauthRequest(
-            'grant_type=authorization_code&client_id=' . $this->getConfig()->get('auth.microsoft.clientid') .
-            '&redirect_uri=' . urlencode($this->getAuthUrl()->toString()) .
-            '&code=' . $request->get('code') .
-            '&code_verifier=' . $token->codeVerifier
-        );
-        $response = $this->postOauthRequest('token', $oauthRequest);
-        if (!$response) {
-            throw new Exception('Unknown error acquiring token');
-        }
-        $reply = json_decode($response);
-        if (isset($reply->error)) {
-            throw new Exception($reply->error_description);
-        }
-        $idToken = base64_decode(explode('.', $reply->id_token)[1]);
-        $redirect = Uri::create($token->redirect);
+            $token = TokenMap::create()->findBySessionKey($this->getSession()->get(Token::SESSION_KEY, ''));
+            if (!$token) {
+                Log::Error('MS oAuth validation failed!');
+                Uri::create('/')->redirect();
+            }
+            $oauthRequest = $this->generateOauthRequest(
+                'grant_type=authorization_code&client_id=' . $this->getConfig()->get('auth.microsoft.clientid') .
+                '&redirect_uri=' . urlencode($this->getAuthUrl()->toString()) .
+                '&code=' . $request->get('code') .
+                '&code_verifier=' . $token->codeVerifier
+            );
+            $response = $this->postOauthRequest('token', $oauthRequest);
+            if (!$response) {
+                throw new Exception('Unknown error acquiring token');
+            }
+            $reply = json_decode($response);
+            if (isset($reply->error)) {
+                throw new Exception($reply->error_description);
+            }
+            $idToken = base64_decode(explode('.', $reply->id_token)[1]);
+            $redirect = Uri::create($token->redirect);
 
-        $token->token = $reply->access_token;
-        $token->refreshToken = $reply->refresh_token;
-        $token->idToken = $idToken;
-        $token->redirect = '';
-        $token->expires = Date::create()->add(new \DateInterval('PT'.$reply->expires_in.'S'));
-        $token->save();
+            $token->token = $reply->access_token;
+            $token->refreshToken = $reply->refresh_token;
+            $token->idToken = $idToken;
+            $token->redirect = '';
+            $token->expires = Date::create()->add(new \DateInterval('PT' . $reply->expires_in . 'S'));
+            $token->save();
 
-        $redirect->redirect();
+            $redirect->redirect();
+        } catch (\Exception $e) {
+            if ($token && $token->getId()) {
+                $token->delete();
+            }
+        }
     }
 
     protected function getMsAuthUrl(): Uri
