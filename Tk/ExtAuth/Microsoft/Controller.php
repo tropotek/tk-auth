@@ -132,8 +132,6 @@ class Controller extends \Bs\Controller\Iface
         if (!$this->getConfig()->get('auth.microsoft.enabled')) {
             throw new Exception('Microsoft authentication not enabled on this site.');
         }
-        $this->error = 'Cannot find institution`s login page.';
-        return;
         $token = null;
 
         try {
