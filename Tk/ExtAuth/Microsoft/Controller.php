@@ -132,6 +132,8 @@ class Controller extends \Bs\Controller\Iface
         if (!$this->getConfig()->get('auth.microsoft.enabled')) {
             throw new Exception('Microsoft authentication not enabled on this site.');
         }
+        $this->error = 'Cannot find institution`s login page.';
+        return;
         $token = null;
 
         try {
@@ -211,6 +213,7 @@ class Controller extends \Bs\Controller\Iface
             if ($token && $token->getId()) {
                 $token->delete();
             }
+            $this->error = $e->getMessage();
         }
     }
 
@@ -256,6 +259,7 @@ class Controller extends \Bs\Controller\Iface
             if ($token && $token->getId()) {
                 $token->delete();
             }
+            $this->error = $e->getMessage();
         }
     }
 
@@ -349,7 +353,8 @@ class Controller extends \Bs\Controller\Iface
         $template = parent::show();
 
         if ($this->error) {
-            $template->insertHtml('error', 'Error: ' . $this->error);
+            $template->insertHtml('error', htmlentities($this->error));
+            $template->setAttr('logout', 'href', htmlentities($this->getConfig()->get('auth.microsoft.logout')));
             $template->setVisible('error');
         } else {
             $template->setVisible('no-error');
@@ -368,7 +373,11 @@ class Controller extends \Bs\Controller\Iface
         $xhtml = <<<HTML
 <div class="tk-microsoft-auth">
 <p choice="no-error">Logging you in.</p>
-<p var="error" choice="error"></p>
+<div choice="error">
+  <h4>Login Error!</h4>
+  <p var="error"></p>
+  <p>Please <a href="#" var="logout">logout</a> and try again</p>
+</div>
 </div>
 HTML;
 

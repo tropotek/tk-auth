@@ -126,7 +126,7 @@ MYSQL;
 
     public function cleanExpired()
     {
-        $maxRefresh = strtotime('-72 hour');
+        $maxRefresh = strtotime('-42 hour');
         return $this->getDb()->exec('DELETE FROM ' . $this->getTable() . ' WHERE expires < ' . $this->quote(date('Y-m-d H:i:s', $maxRefresh)));
     }
 
