@@ -349,7 +349,7 @@ class Controller extends \Bs\Controller\Iface
         $template = parent::show();
 
         if ($this->error) {
-            $template->insertText('error', 'Error: ' . $this->error);
+            $template->insertHtml('error', 'Error: ' . $this->error);
             $template->setVisible('error');
         } else {
             $template->setVisible('no-error');
