@@ -3,6 +3,7 @@ namespace Tk\Auth\Adapter;
 
 use Tk\Auth\Auth;
 use Tk\Auth\Result;
+use Tk\Db\Mapper\Mapper;
 use Tk\Db\Pdo;
 
 /**
@@ -12,24 +13,14 @@ use Tk\Db\Pdo;
  *
  * @author Tropotek <http://www.tropotek.com/>
  */
-class DbTable extends AdapterInterface
+class AuthUser extends AdapterInterface
 {
 
-    protected string $tableName = 'user';
+    protected Mapper $mapper;
 
-    protected string $usernameColumn = 'username';
-
-    protected string $passwordColumn = 'password';
-
-    protected Pdo $db;
-
-
-    public function __construct(Pdo $db, string $tableName = 'user', string $userColumn = 'username', string $passColumn = 'password')
+    public function __construct(Mapper $mapper)
     {
-        $this->db = $db;
-        $this->tableName = $tableName;
-        $this->usernameColumn = $userColumn;
-        $this->passwordColumn = $passColumn;
+        $this->mapper = $mapper;
     }
 
     /**
@@ -41,20 +32,7 @@ class DbTable extends AdapterInterface
         if ($this->getOnHash()) {
             return call_user_func_array($this->getOnHash(), [$password, $user]);
         }
-        return Auth::hashPassword($password, $user->hash ?? null);
-    }
-
-    protected function getUserRow(string $username): object|false
-    {
-        $sql = sprintf('SELECT * FROM %s WHERE %s = :username LIMIT 1',
-            $this->db->quoteParameter($this->tableName),
-            $this->db->quoteParameter($this->usernameColumn)
-        );
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(compact($username));
-
-        return $stmt->fetchObject();
+        return Auth::hashPassword($password, $user->getHash() ?? null);
     }
 
     public function authenticate(): Result
@@ -68,8 +46,8 @@ class DbTable extends AdapterInterface
         }
 
         try {
-            $user = $this->getUserRow($username);
-            if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
+            $user = $this->mapper->findByUsername($username);
+            if ($user && $this->hashPassword($password, $user) == $user->getPassword()) {
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {
