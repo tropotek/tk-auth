@@ -15,16 +15,16 @@ use Tk\Db\Pdo;
 class DbTable extends AdapterInterface
 {
 
-    protected string $tableName = '';
+    protected string $tableName = 'user_auth';
 
-    protected string $usernameColumn = '';
+    protected string $usernameColumn = 'username';
 
-    protected string $passwordColumn = '';
+    protected string $passwordColumn = 'password';
 
     protected Pdo $db;
 
 
-    public function __construct(Pdo $db, string $tableName, string $userColumn, string $passColumn)
+    public function __construct(Pdo $db, string $tableName = 'user_auth', string $userColumn = 'username', string $passColumn = 'password')
     {
         $this->db = $db;
         $this->tableName = $tableName;
