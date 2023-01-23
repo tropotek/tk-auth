@@ -38,9 +38,6 @@ class DbTable extends AdapterInterface
      */
     public function hashPassword(string $password, $user = null): string
     {
-        if ($this->getOnHash()) {
-            return call_user_func_array($this->getOnHash(), [$password, $user]);
-        }
         return Auth::hashPassword($password, $user->hash ?? null);
     }
 

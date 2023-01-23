@@ -1,6 +1,7 @@
 <?php
 namespace Tk\Auth\Adapter;
 
+use Bs\Db\UserInterface;
 use Tk\Auth\Auth;
 use Tk\Auth\Result;
 use Tk\Db\Mapper\Mapper;
@@ -18,6 +19,7 @@ class AuthUser extends AdapterInterface
 
     protected Mapper $mapper;
 
+
     public function __construct(Mapper $mapper)
     {
         $this->mapper = $mapper;
@@ -27,11 +29,8 @@ class AuthUser extends AdapterInterface
      * This will hash the password using the $user->hash value as a salt if it exists.
      * You can override the hash function by using DbTable::setOnHash(callable)
      */
-    public function hashPassword(string $password, $user = null): string
+    public function hashPassword(string $password, UserInterface $user): string
     {
-        if ($this->getOnHash()) {
-            return call_user_func_array($this->getOnHash(), [$password, $user]);
-        }
         return Auth::hashPassword($password, $user->getHash() ?? null);
     }
 
