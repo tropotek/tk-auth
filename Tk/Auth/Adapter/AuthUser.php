@@ -5,7 +5,6 @@ use Bs\Db\UserInterface;
 use Tk\Auth\Auth;
 use Tk\Auth\Result;
 use Tk\Db\Mapper\Mapper;
-use Tk\Db\Pdo;
 
 /**
  * A DB table authenticator adaptor
