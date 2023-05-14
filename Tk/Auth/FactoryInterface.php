@@ -3,9 +3,6 @@ namespace Tk\Auth;
 
 use Tk\Auth\Adapter\AdapterInterface;
 
-/**
- * @author Tropotek <http://www.tropotek.com/>
- */
 interface FactoryInterface
 {
 

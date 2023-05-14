@@ -6,8 +6,6 @@ use Tk\Auth\Result;
 /**
  * This object only checks for a valid username and returns a valid result
  * Use it for testing or if you require a username only login
- *
- * @author Tropotek <http://www.tropotek.com/>
  */
 class NullAuth extends AdapterInterface
 {
@@ -26,5 +24,5 @@ class NullAuth extends AdapterInterface
         }
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, '', 'Invalid credentials.');
     }
- 
+
 }

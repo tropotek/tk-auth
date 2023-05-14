@@ -1,9 +1,6 @@
 <?php
 namespace Tk\Auth\Storage;
 
-/**
- * @author Tropotek <http://www.tropotek.com/>
- */
 interface StorageInterface
 {
     /**

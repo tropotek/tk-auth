@@ -3,8 +3,6 @@ namespace Tk\Auth;
 
 /**
  * Auth result object
- *
- * @author Tropotek <http://www.tropotek.com/>
  */
 class Result
 {

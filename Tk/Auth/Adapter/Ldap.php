@@ -7,8 +7,6 @@ use Tk\Auth\Result;
  * LDAP Authentication adapter
  *
  * This adapter requires that the password and username are submitted in a POST request
- *
- * @author Tropotek <http://www.tropotek.com/>
  */
 class Ldap extends AdapterInterface
 {

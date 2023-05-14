@@ -10,8 +10,7 @@ use Tk\Db\Mapper\Mapper;
  * A DB table authenticator adaptor
  *
  * This adaptor requires that the password and username are submitted in a POST request
- *
- * @author Tropotek <http://www.tropotek.com/>
+ * @see https://www.php.net/manual/en/function.password-hash.php
  */
 class AuthUser extends AdapterInterface
 {
@@ -22,15 +21,6 @@ class AuthUser extends AdapterInterface
     public function __construct(Mapper $mapper)
     {
         $this->mapper = $mapper;
-    }
-
-    /**
-     * This will hash the password using the $user->hash value as a salt if it exists.
-     * You can override the hash function by using DbTable::setOnHash(callable)
-     */
-    public function hashPassword(string $password, UserInterface $user): string
-    {
-        return Auth::hashPassword($password, $user->getHash() ?? null);
     }
 
     public function authenticate(): Result
@@ -45,7 +35,7 @@ class AuthUser extends AdapterInterface
 
         try {
             $user = $this->mapper->findByUsername($username);
-            if ($user && $this->hashPassword($password, $user) == $user->getPassword()) {
+            if ($user && password_verify($password, $user->getPassword())) {
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {

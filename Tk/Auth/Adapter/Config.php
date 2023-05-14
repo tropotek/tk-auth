@@ -13,8 +13,6 @@ use Tk\Auth\Auth;
  * It is ideal for low security sites that do not hold sensitive information.
  *
  * This adaptor requires that the password and username are submitted in a POST/GET request
- * 
- * @author Tropotek <http://www.tropotek.com/>
  */
 class Config extends AdapterInterface
 {
@@ -38,7 +36,7 @@ class Config extends AdapterInterface
         // get values from a post or get request
         $username = $this->getFactory()->getRequest()->get('username');
         $password = $this->getFactory()->getRequest()->get('password');
-        
+
         if ($this->requiredUsername && $this->requiredPassword) {
             if ($username == $this->requiredUsername && Auth::hashPassword($password) == $this->requiredPassword) {
                 return new Result(Result::SUCCESS, $username);
@@ -46,5 +44,5 @@ class Config extends AdapterInterface
         }
         return new Result(Result::FAILURE_CREDENTIAL_INVALID, $username, 'Invalid username or password.');
     }
- 
+
 }

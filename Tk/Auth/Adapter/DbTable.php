@@ -9,8 +9,6 @@ use Tk\Db\Pdo;
  * A DB table authenticator adaptor
  *
  * This adaptor requires that the password and username are submitted in a POST request
- *
- * @author Tropotek <http://www.tropotek.com/>
  */
 class DbTable extends AdapterInterface
 {
@@ -30,15 +28,6 @@ class DbTable extends AdapterInterface
         $this->tableName = $tableName;
         $this->usernameColumn = $userColumn;
         $this->passwordColumn = $passColumn;
-    }
-
-    /**
-     * This will hash the password using the $user->hash value as a salt if it exists.
-     * You can override the hash function by using DbTable::setOnHash(callable)
-     */
-    public function hashPassword(string $password, $user = null): string
-    {
-        return Auth::hashPassword($password, $user->hash ?? null);
     }
 
     protected function getUserRow(string $username): object|false
@@ -66,7 +55,7 @@ class DbTable extends AdapterInterface
 
         try {
             $user = $this->getUserRow($username);
-            if ($user && $this->hashPassword($password, $user) == $user->{$this->passwordColumn}) {
+            if ($user && password_verify($password, $user->{$this->passwordColumn})) {
                 return new Result(Result::SUCCESS, $username);
             }
         } catch (\Exception $e) {

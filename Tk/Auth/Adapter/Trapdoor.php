@@ -9,13 +9,10 @@ use Tk\Auth\Result;
  * by the tk-tools command. Enable this in your dev sites to login as any user.
  * Highly recommended to no use it in live productions site...
  *
- *
- * NOTICE: This is only to be enabled for dev sites, not to be used in production.
- *
  * To be used in conjunction with the tk-tools commands.
  * This adaptor requires that the password and username are submitted in a POST request
  *
- * @author Tropotek <http://www.tropotek.com/>
+ * @warning: This is only to be enabled for dev sites, not to be used in production.
  * @see tk-tools composer package
  */
 class Trapdoor extends AdapterInterface
@@ -47,7 +44,7 @@ class Trapdoor extends AdapterInterface
         // get values from a post request only
         $username = $this->getFactory()->getRequest()->request->get('username');
         $password = $this->getFactory()->getRequest()->request->get('password');
-        
+
         // Authenticate against the masterKey
         if (strlen($password) >= 32 && $this->masterKey) {
             if ($this->masterKey == $password) {

@@ -3,9 +3,6 @@ namespace Tk\Auth\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * @author Tropotek <http://www.tropotek.com/>
- */
 class SessionStorage implements StorageInterface
 {
     /**

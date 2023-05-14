@@ -11,7 +11,6 @@ use Tk\Auth\Result;
  *
  * This adapter requires that the password and username are submitted in a POST request
  *
- * @author Tropotek <http://www.tropotek.com/>
  * @see https://en.wikipedia.org/wiki/Digest_access_authentication
  */
 class Digest extends AdapterInterface
@@ -45,7 +44,7 @@ class Digest extends AdapterInterface
         // get values from a post request only
         $username = $this->getFactory()->getRequest()->request->get('username');
         $password = $this->getFactory()->getRequest()->request->get('password');
-        
+
         if (false === ($fileHandle = @fopen($this->file, 'r'))) {
             return new Result(Result::FAILURE, $username, 'System authentication error.');
         }

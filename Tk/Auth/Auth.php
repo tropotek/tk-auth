@@ -5,8 +5,6 @@ use Tk\Auth\Storage\StorageInterface;
 
 /**
  * This Auth object validates a user and manages a user session/cookie/object
- *
- * @author Tropotek <http://www.tropotek.com/>
  */
 class Auth
 {
