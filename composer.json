@@ -17,13 +17,9 @@
   "autoload": {
     "psr-0": {
       "Tk\\": ""
-    },
-    "exclude-from-classmap": [
-      "/tests/"
-    ]
+    }
   },
   "require": {
-    "php": "^8.1"
   },
   "extra": {
     "branch-alias": {
