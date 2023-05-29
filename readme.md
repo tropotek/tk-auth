@@ -24,11 +24,12 @@ composer require ttek/tk-auth
 Or add the following to your composer.json file:
 
 ```json
-"ttek/tk-auth": "~3.2"
+{
+  "require": {
+    "ttek/tk-auth": "~8.0.0"
+  }
+}
 ```
-
-If you do not use Composer, you can grab the code from GitHub, and use any
-PSR-0 compatible autoloader to load the classes.
 
 ## Introduction
 
