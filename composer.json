@@ -1,29 +1,29 @@
 {
-  "name": "ttek/tk-auth",
-  "type": "library",
-  "description": "An authentication library for ttek based websites",
-  "keywords": [
-    "tropotek",
-    "Auth"
-  ],
-  "time": "2022-10-15",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Michael Mifsud",
-      "homepage": "http://www.tropotek.com/"
+    "name": "ttek/tk-auth",
+    "type": "library",
+    "description": "An authentication library for ttek based websites",
+    "keywords":  [
+        "tropotek",
+        "Auth"
+    ],
+    "time": "2023-06-27",
+    "license": "MIT",
+    "authors":  [
+         {
+            "name": "Michael Mifsud",
+            "homepage": "http://www.tropotek.com/"
+        }
+    ],
+    "autoload":  {
+        "psr-4":  {
+            "Tk\\": "Tk/"
+        }
+    },
+    "require":  {
+    },
+    "extra":  {
+        "branch-alias":  {
+            "dev-master": "8.0.x-dev"
+        }
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "Tk\\": "Tk/"
-    }
-  },
-  "require": {
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "8.0.x-dev"
-    }
-  }
 }

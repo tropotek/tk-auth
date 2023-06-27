@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 8.0.0 [2023-06-27]:
+-------------------------------
+  - update requirements to PHP 8.1
+  - Setup new lib for php8
+
+
 Ver 3.2.6 [2022-08-11]:
 -------------------------------
 
