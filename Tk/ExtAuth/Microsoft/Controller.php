@@ -141,7 +141,7 @@ class Controller extends \Bs\Controller\Iface
             if ($this->getAuthUser()) {
                 // logout user
                 $event = new AuthEvent();
-                $this->getConfig()->getEventDispatcher()->dispatch(AuthEvents::LOGOUT, $event);
+                $this->getConfig()->getEventDispatcher()->dispatch($event, AuthEvents::LOGOUT);
                 Uri::create()->redirect();
             }
 

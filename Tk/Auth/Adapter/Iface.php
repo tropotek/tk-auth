@@ -52,7 +52,7 @@ abstract class Iface
         /** @var \Tk\EventDispatcher\EventDispatcher $dispatcher */
         $dispatcher = $this->getConfig()->getEventDispatcher();
         if ($dispatcher) {
-            $dispatcher->dispatch(\Tk\Auth\AuthEvents::LOGIN_PROCESS, $this->event);
+            $dispatcher->dispatch($this->event, \Tk\Auth\AuthEvents::LOGIN_PROCESS);
         }
         return $this->event;
     }
