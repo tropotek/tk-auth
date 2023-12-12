@@ -127,6 +127,21 @@ class Controller extends \Bs\Controller\Iface
         \Bs\Uri::createHomeUrl('/index.html', $user)->redirect();
     }
 
+    public function doLogout(Request $request)
+    {
+        if (!$this->getConfig()->get('auth.microsoft.enabled')) {
+            throw new Exception('Microsoft authentication not enabled on this site.');
+        }
+
+        $token = TokenMap::create()->findBySessionKey($this->getSession()->get(Token::SESSION_KEY, ''));
+        if ($token) {
+            $token->delete();
+            \Tk\Log::warning('Destroying Session');
+            $this->getConfig()->getSession()->destroy();
+            Uri::create('/index.html')->redirect();
+        }
+    }
+
     public function doLogin(Request $request)
     {
         if (!$this->getConfig()->get('auth.microsoft.enabled')) {
@@ -361,8 +376,6 @@ class Controller extends \Bs\Controller\Iface
         return $template;
     }
 
-
-
     /**
      * @return \Dom\Template
      */
@@ -381,7 +394,5 @@ HTML;
 
         return \Dom\Loader::load($xhtml);
     }
-
-
 
 }

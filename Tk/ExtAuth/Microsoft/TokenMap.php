@@ -60,6 +60,7 @@ MYSQL;
      */
     public function findBySessionKey(string $sessionKey): ?Token
     {
+        if (empty($sessionKey)) return null;
         return $this->findFiltered(['sessionKey' => $sessionKey])->current();
     }
 
@@ -124,10 +125,9 @@ MYSQL;
     }
 
 
-    public function cleanExpired()
+    public function cleanExpired(): bool
     {
-        $maxRefresh = strtotime('-42 hour');
-        return $this->getDb()->exec('DELETE FROM ' . $this->getTable() . ' WHERE expires < ' . $this->quote(date('Y-m-d H:i:s', $maxRefresh)));
+        return false !== $this->getDb()->exec('DELETE FROM ' . $this->getTable() . ' WHERE expires < NOW() - INTERVAL 2 DAY');
     }
 
 }

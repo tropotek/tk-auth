@@ -80,7 +80,7 @@ class Token extends Model
      */
     public function getPhoto(): string
     {
-        //Photo is a bit different, we need to request the image data which will include content type, size etc, then request the image
+        // Photo is a bit different, we need to request the image data which will include content type, size etc, then request the image
         $photoType = json_decode($this->sendGetRequest('https://graph.microsoft.com/v1.0/me/photo/'));
         $photo = $this->sendGetRequest('https://graph.microsoft.com/v1.0/me/photo/%24value');
         if (isset($photoType->{'@odata.mediaContentType'})) {
