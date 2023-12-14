@@ -134,12 +134,12 @@ class Controller extends \Bs\Controller\Iface
         }
 
         $token = TokenMap::create()->findBySessionKey($this->getSession()->get(Token::SESSION_KEY, ''));
+        \Tk\Log::warning('Destroying Session');
+        $this->getConfig()->getSession()->destroy();
         if ($token) {
             $token->delete();
-            \Tk\Log::warning('Destroying Session');
-            $this->getConfig()->getSession()->destroy();
-            Uri::create('/index.html')->redirect();
         }
+        Uri::create('/index.html')->redirect();
     }
 
     public function doLogin(Request $request)
@@ -368,6 +368,12 @@ class Controller extends \Bs\Controller\Iface
         if ($this->error) {
             $template->insertHtml('error', htmlentities($this->error));
             $template->setAttr('logout', 'href', htmlentities($this->getConfig()->get('auth.microsoft.logout')));
+
+            $loginUrl = \Tk\Uri::create('/xlogin.html');
+            if ($this->getConfig()->getInstitution()) {
+                $loginUrl = \Uni\Uri::createInstitutionUrl('/login.html');
+            }
+            $template->setAttr('login', 'href', htmlentities($loginUrl->toString()));
             $template->setVisible('error');
         } else {
             $template->setVisible('no-error');
@@ -388,6 +394,7 @@ class Controller extends \Bs\Controller\Iface
   <h4>Login Error!</h4>
   <p var="error"></p>
   <p>Please <a href="#" var="logout">logout</a> and try again</p>
+  <p>Or try to <a href="#" var="login">login</a> again</p>
 </div>
 </div>
 HTML;
