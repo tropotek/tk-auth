@@ -1,5 +1,17 @@
 #CHANGELOG#
 
+Ver 3.2.18 [2023-12-19]:
+-------------------------------
+  - updated MS SSO and login page
+  - Tagging and releasing branch `3.2` with version `3.2.16`.
+  - Tagging and releasing branch `3.2` with version `3.2.14`.
+  - Tagging and releasing branch `3.2` with version `3.2.12`.
+  - Merge branch '3.2' of https://github.com/tropotek/tk-auth into 3.2
+  - Tagging and releasing branch `3.2` with version `3.2.10`.
+  - Tagging and releasing branch `3.2` with version `3.2.8`.
+  - Added new activate page and tests for dbTable authentication
+
+
 Ver 3.2.16 [2023-11-18]:
 -------------------------------
   - Tagging and releasing branch `3.2` with version `3.2.14`.
